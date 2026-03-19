@@ -1,0 +1,1019 @@
+{
+  "name": "Customer Support AI  Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8e9ec2b0-0311-4474-a5fa-10ef9d391e7d",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c018c029-c574-4ce0-a0a2-90147b0761fa",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "cca34931-5eb5-472d-b415-0744615a274d",
+      "name": "Clean the data"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are helpful email classifying Assistant that classifies the email when you receive the input.\n"
+            },
+            {
+              "role": "system",
+              "content": "=##Overview\nYou are an Email Classifying Assistant.\n\nEmail :{{ $json.text }}\n\nYour task is to read the incoming email and classify it into exactly one of the following categories:\n\n- refund: The customer requests a refund or return for a product or service.\n- complaint: The customer expresses dissatisfaction, frustration, or reports a bad experience.\n- product_question: The customer asks questions about product details, availability, pricing, features, or specifications.\n- technical_issue: The customer reports a technical problem, bug, login issue, or something not working properly.\n- other: The email does not fit into any of the above categories.\n\n##Instructions:\n1. Carefully analyze the email content.\n2. Choose the single best matching category.\n3. Respond with ONLY the category name.\n4. Do not include explanations, extra text, or formatting.\n\nAlso determine if the email is urgent.\n\nUrgent = true if the customer is angry, demands immediate action, or mentions words like \"urgent\", \"immediately\", \"asap\".\n\nOUTPUT RULES (VERY IMPORTANT):\n- Return ONLY valid JSON.\n- Do NOT include explanations.\n- Do NOT include the word \"text\".\n- Do NOT include markdown.\n- Do NOT include newline escape characters like \\n.\n- Do NOT include anything before or after the JSON.\nReturn ONLY valid JSON in this format:\n\n{\n  \"category\": \"refund | complaint | product_question | technical_issue | other\",\n  \"urgent\": true or false\n}\n\nDont return like this:\n{\\n \"category\": \"refund\",\\n \"urgent\": true\\n}\n\nNeed only a clean JSON"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "e1c591f3-f296-47ec-8489-fb4649eb4f22",
+      "name": "Sentiment Analysis",
+      "credentials": {
+        "openAiApi": {
+          "id": "knhweLUXWDR0SurQ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1712,
+        528
+      ],
+      "id": "a476cd8a-1f47-47a9-8a07-41111d2e672b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "knhweLUXWDR0SurQ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Work with data in Supabase Vector Database",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        2112,
+        480
+      ],
+      "id": "0e207ff9-854c-4359-90a1-805dbc982be9",
+      "name": "Vector Database",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kkqnPvR40j0v0gdw",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2256,
+        816
+      ],
+      "id": "041ccc0d-b843-48f0-861b-6e2f8f0c4294",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "4udR7cdjb6vWxSJG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nYou are a helpful creative information extracting assistant that helps to reply to the email sent by the customer.\n\nEmail text:{{ $('Clean the data').item.json.text }}",
+        "options": {
+          "systemMessage": "=##Overview\n\nYou are a helpful creative information extracting assistant that helps to answer any queries to the user.\n\nEmail text:{{ $('Clean the data').item.json.text }}\n\nCategory :{{ $('Convert to JSON').item.json.category }}\n\n## Tools\nVector Database -This should be ALWAYS used when replying to any emails that you get from user.\n\nGmail Reply-Use this tool to send a reply to a user.\n\n## Rules\n-ALWAYS use this database Vector Database for replying a email when the category is refund or product_question .\n-The answer should be precise and to the point and relevant to the question.\nWrite a professional customer support email.\n- Use clear paragraphs with line breaks.\n- Do NOT write the whole email in one paragraph.\n- Add spacing between sections.\n- Display numbered steps on separate lines.\n- Place the email signature on a new line at the end (not inside a paragraph).\n- Make the email easy to read and professional.\n\n\n\nStructure the email like this:\n\nGreeting\n\nApology and explanation\n\nInstructions for return (numbered steps)\n\nRefund information\n\nSupport contact message\n\nSignature on a separate line\nCustomer Support Team\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2000,
+        288
+      ],
+      "id": "e7cfd7f9-1cba-4fda-8f9b-209765a5cc26",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        1888,
+        592
+      ],
+      "id": "6d3a367f-3ad7-47f9-8423-2ecce75a9d5a",
+      "name": "Gmail Reply",
+      "webhookId": "c6aa456e-b195-47c8-88cd-cd6ff6c892a7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U0AM1KJP0BC",
+          "mode": "list",
+          "cachedResultName": "pavithrasadheeshkumar"
+        },
+        "text": "={{ $json.properties.subject.versions[0].value }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        2000,
+        -32
+      ],
+      "id": "c3ffaf47-09ae-47a7-9128-729e412f04c0",
+      "name": "Alert the Sales Team",
+      "webhookId": "2f6a8aec-92ac-4ce4-85e9-fc393860ae4a",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "MtxAU9MwR0VEzbNT",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ntfqf1oPWBz0YMs3mG6tRMwKp1bT1ub7_ymWZxBX3BI",
+          "mode": "list",
+          "cachedResultName": "Customer log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ntfqf1oPWBz0YMs3mG6tRMwKp1bT1ub7_ymWZxBX3BI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ntfqf1oPWBz0YMs3mG6tRMwKp1bT1ub7_ymWZxBX3BI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Gmail Trigger').item.json.from.value[0].name }}",
+            "Email": "={{ $('Gmail Trigger').item.json.from.value[0].address }}",
+            "issue": "={{ $('Clean the data').item.json.text }}",
+            "category": "={{ $('Convert to JSON').item.json.category }}",
+            "Urgent": "={{ $('Convert to JSON').item.json.urgent }}",
+            "Ticket No": "={{ $('Ctreate Ticket ').item.json.objectId }}",
+            "Reply": "=Sent a slack alert to sales team"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "issue",
+              "displayName": "issue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Urgent",
+              "displayName": "Urgent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ticket No",
+              "displayName": "Ticket No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reply",
+              "displayName": "Reply",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2208,
+        -32
+      ],
+      "id": "08c7bf93-5480-4d19-bc79-f5fc4e20e191",
+      "name": "Log entry in CRM",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "ticket",
+        "pipelineId": "0",
+        "stageId": "1",
+        "ticketName": "={{ $('Convert to JSON').item.json.category }}_{{ $('Gmail Trigger').item.json.subject }}",
+        "additionalFields": {
+          "associatedContactIds": [
+            "={{ $json.vid }}"
+          ],
+          "createDate": "={{ $now.format('ff') }}",
+          "description": "={{ $('Gmail Trigger').item.json.text }}",
+          "priority": "HIGH",
+          "ticketOwnerId": 89083738
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        1792,
+        -32
+      ],
+      "id": "dc352cbb-2dcf-40c0-b8fd-2ff4dddf0f2a",
+      "name": "Ctreate Ticket ",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "4PX3ztYaG2beYRYL",
+          "name": "HubSpot OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "get",
+        "contactId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "additionalFields": {
+          "propertiesCollection": {
+            "propertiesValues": {
+              "properties": [
+                "firstname",
+                "lastname",
+                "company",
+                "email"
+              ]
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        1568,
+        -32
+      ],
+      "id": "e2df4b93-84ed-49f4-a845-dda3cfdd0af6",
+      "name": "Get Contact from CRM",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "4PX3ztYaG2beYRYL",
+          "name": "HubSpot OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "search",
+        "filterGroupsUi": {
+          "filterGroupsValues": [
+            {
+              "filtersUi": {
+                "filterValues": [
+                  {
+                    "propertyName": "email|string",
+                    "value": "={{ $('Gmail Trigger').item.json.from.value[0].address }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "properties": [
+            "firstname",
+            "lastname",
+            "email",
+            "company"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        -32
+      ],
+      "id": "da757de4-9dc5-4940-a9e4-9bed72f031a2",
+      "name": "Search contact in CRM",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "4PX3ztYaG2beYRYL",
+          "name": "HubSpot OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ntfqf1oPWBz0YMs3mG6tRMwKp1bT1ub7_ymWZxBX3BI",
+          "mode": "list",
+          "cachedResultName": "Customer log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ntfqf1oPWBz0YMs3mG6tRMwKp1bT1ub7_ymWZxBX3BI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ntfqf1oPWBz0YMs3mG6tRMwKp1bT1ub7_ymWZxBX3BI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Gmail Trigger').item.json.from.value[0].name }}",
+            "Email": "={{ $('Gmail Trigger').item.json.from.value[0].address }}",
+            "issue": "={{ $('Clean the data').item.json.text }}",
+            "category": "={{ $('Convert to JSON').item.json.category }}",
+            "Urgent": "={{ $('Convert to JSON').item.json.urgent }}",
+            "Ticket No": "={{ $('Create a Ticket').item.json.objectId }}",
+            "Reply": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "issue",
+              "displayName": "issue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Urgent",
+              "displayName": "Urgent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ticket No",
+              "displayName": "Ticket No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reply",
+              "displayName": "Reply",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2384,
+        272
+      ],
+      "id": "7e148edd-1157-46b3-8c6b-f79815884134",
+      "name": "Log the entry in CRM",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "ticket",
+        "pipelineId": "0",
+        "stageId": "1",
+        "ticketName": "={{ $('Convert to JSON').item.json.category }}_{{ $('Gmail Trigger').item.json.subject }}",
+        "additionalFields": {
+          "associatedContactIds": [
+            "={{ $json.vid }}"
+          ],
+          "createDate": "={{ $now.format('ff') }}",
+          "description": "={{ $('Gmail Trigger').item.json.text }}",
+          "priority": "MEDIUM",
+          "ticketOwnerId": "89083738"
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        1712,
+        240
+      ],
+      "id": "744388ba-ca65-4adf-9389-8ce5506de675",
+      "name": "Create a Ticket",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "4PX3ztYaG2beYRYL",
+          "name": "HubSpot OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "get",
+        "contactId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "additionalFields": {
+          "propertiesCollection": {
+            "propertiesValues": {
+              "properties": [
+                "firstname",
+                "lastname",
+                "company",
+                "email"
+              ]
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        240
+      ],
+      "id": "93b2c92a-808c-4b1b-8b40-bb215e3d3749",
+      "name": "Get a contact from CRM",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "4PX3ztYaG2beYRYL",
+          "name": "HubSpot OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "search",
+        "filterGroupsUi": {
+          "filterGroupsValues": [
+            {
+              "filtersUi": {
+                "filterValues": [
+                  {
+                    "propertyName": "email|string",
+                    "value": "={{ $('Gmail Trigger').item.json.from.value[0].address }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "properties": [
+            "firstname",
+            "lastname",
+            "email",
+            "company"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        352
+      ],
+      "id": "c375ef3b-0082-497b-809d-7c4ed3a4074b",
+      "name": "Search contacts from CRM",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "4PX3ztYaG2beYRYL",
+          "name": "HubSpot OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "33c6425f-0358-4149-8bbd-4d420ec055e9",
+              "leftValue": "={{ $json.urgent }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "ceba16fd-e4c2-4a52-b889-cefb6f83a040",
+      "name": "Routing the Urgent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json.output[0].content[0].text;\nconst parsed = JSON.parse(data);\n\nreturn [\n  {\n    json: parsed\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "5207b38a-b6f4-4bc2-be2b-0d301c3fb3f2",
+      "name": "Convert to JSON"
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "19d05695734ca44d",
+          "threadId": "19d05695734ca44d",
+          "labelIds": [
+            "UNREAD",
+            "IMPORTANT",
+            "CATEGORY_PERSONAL",
+            "INBOX"
+          ],
+          "sizeEstimate": 8606,
+          "headers": {
+            "delivered-to": "Delivered-To: pavinp5@gmail.com",
+            "received": "Received: from mail-sor-f65.google.com (mail-sor-f65.google.com. [209.85.220.65])\r\n        by mx.google.com with SMTPS id 71dfb90a1353d-56ba7104fedsor1009895e0c.9.2026.03.19.02.24.42\r\n        for <pavinp5@gmail.com>\r\n        (Google Transport Security);\r\n        Thu, 19 Mar 2026 02:24:42 -0700 (PDT)",
+            "x-received": "X-Received: by 2002:a05:6122:29ce:b0:56c:d401:4aff with SMTP id\r\n 71dfb90a1353d-56cd401539cmr529209e0c.0.1773912282183; Thu, 19 Mar 2026\r\n 02:24:42 -0700 (PDT)",
+            "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; t=1773912282; cv=none;\r\n        d=google.com; s=arc-20240605;\r\n        b=cKLeaGoStV4mmAb1+9vFtv23ZojDS+XpSvZkeujdgTsRD+sCTsbizCg+AzEoTwNjVz\r\n         LFT0d/T/pghzeFIcvfdD0uE2L5LyCX30JExppvRMcREGkus/Oa8F4O4NkeyPkFlqHQmj\r\n         0zEyhu7LnM1hhHbHj7tsdvDK1ParoEvSkupcTYHYWPi+JuTM9GJW6gu3wpikmN1GCEZs\r\n         Qu/PVPbrK+8e3gAGa1BBZTdGfneTvXTAeXAxYUO6QKEja7itDga75kwL9twlCbBTOGb6\r\n         T6kl5WFRvsohifb+D+ZGavnjFRqPw2m0fXDFpiqZLMigpRrDi6b0MBFQMkGyK/IXjhT3\r\n         /LXQ==",
+            "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;\r\n        h=to:subject:message-id:date:from:mime-version:dkim-signature;\r\n        bh=NwBO5Mw0ggBn73ltBtP0FZgluwzYKfbf26O1vASdp9A=;\r\n        fh=mqQigP2oqii2lWyOruGW+sszjYIMMoQ3tVe6vgafjks=;\r\n        b=bDK1k7da2VdPgrT8GyPBK6OLEN/2fu7LyiezDIkYPuGeHlz5kDGPgZ6Sfb5VQm7IWE\r\n         yBYDuBiUsGezQpdHFqUkbwSgMy0EYImfvcY85HU/UTeSyOi0tseNiktOlB3ewvz2SJQU\r\n         cQFIuOHO9xkhhY7CMmIv4OZDqiblNZeZwynDLLNhhqsAXyFTHmGutrEXxxn2FOJK+fNJ\r\n         IZODGsihbJrSO8sTqSkS8+Le6R4rXw0MjGYvu6ekOfsUuMj1rZ83Fi6ZS6hblAnLiEPL\r\n         nOXPdbzDj+g0qOpTvrInpJEbYr8QU00a8THAAudpdDmoG/4Xw3yphdR0O1rupHpVfQ7L\r\n         +J8A==;\r\n        dara=google.com",
+            "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com; arc=none",
+            "return-path": "Return-Path: <pavithrasadheeshkumar@gmail.com>",
+            "received-spf": "Received-SPF: pass (google.com: domain of pavithrasadheeshkumar@gmail.com designates 209.85.220.65 as permitted sender) client-ip=209.85.220.65;",
+            "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=k3Jx1pDW;\r\n       arc=pass (i=1);\r\n       spf=pass (google.com: domain of pavithrasadheeshkumar@gmail.com designates 209.85.220.65 as permitted sender) smtp.mailfrom=pavithrasadheeshkumar@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+            "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=gmail.com; s=20230601; t=1773912282; x=1774517082; dara=google.com;\r\n        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject\r\n         :date:message-id:reply-to;\r\n        bh=NwBO5Mw0ggBn73ltBtP0FZgluwzYKfbf26O1vASdp9A=;\r\n        b=k3Jx1pDWPtmvCBwGF4rYcGkCIzru0yQ8UXzzjkZK9XVpkNwfqnSqAXndIYxvmkxT21\r\n         Sj+6IfjiHstvkcHJbmvYcgnkj6UySJMl87wC7L6MEHAwRNUncSfyr9tqGNUVHYu1fMh2\r\n         +C0BvvuuyQGk4zTyZtzrtc28/QXmmH/849BooJUl2/fgIO4wfV/ZgVXQUkpi/tNM5deU\r\n         e/Lvw2BVkS290HEqhFMvptTkK2U6oFTbQknJFO4Pos3EM96W4QAycv4h13kQTOv8SruT\r\n         SrP+eozTZ3zH0ktkopq857XhqKOk9VdtyV5153u1/7GjrbZ7Io4BRPi5H2W9Wdgf9LAi\r\n         r9fg==",
+            "x-google-dkim-signature": "X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20251104; t=1773912282; x=1774517082;\r\n        h=to:subject:message-id:date:from:mime-version:x-gm-gg\r\n         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;\r\n        bh=NwBO5Mw0ggBn73ltBtP0FZgluwzYKfbf26O1vASdp9A=;\r\n        b=icfwaULUJ/nfg18UnnTES1ZGOh2QmdYXy8Ma2POFWfRGlAA5oM0ywO6vtsu2GpjHgH\r\n         m+hXjjOBluVEjg91wLQ0Ha2k0DJm8f8tUehNN4d/9KYmD0R+zVM0RsA1Yv/dk6sJDKqb\r\n         FFIxejTWkVa57T1Hj29jeLA55scln4Qfevq/mODUVNqdNzysXJ06hsYdS5RdnfEaHFck\r\n         zPcP6elSND30z/67MpYQuTNjK5QzjDo/Zr8YGpT4WE9ks+uDdsv8vxcMs2OsESAZPQGl\r\n         vQcja7Uipifqt3t1kW7frqdghH5o9yHR36fXsf9rPS+IHlVIBuWrcCj6e21N4mLCVOSw\r\n         By8w==",
+            "x-gm-message-state": "X-Gm-Message-State: AOJu0Yy6vN+SmY0Q9rIbM2OV3rWUDjnt8UITIjKT4q5/r/kZ450nrv92\r\n\tiUbho1rn+za3S5A4W3dvAvF/UXOTKsfIMCeTpikk6j3kjSUCLROOM8qZRmRNfv6cHgG/XdF8ryG\r\n\tfORj58RY2gUlklSYw3AU1Kx4Hg3AFzwjD4C1YMeDGSg==",
+            "x-gm-gg": "X-Gm-Gg: ATEYQzx/P/GLk6iL1IPabyRK6BXbrkwiWjMzYSFx2+h3pOh9k8pO0SfqeysqzwntBMB\r\n\t0Fuf3Ahs1zVaVdAjJUyJ3UMvCtF+KqLL9dSK2JrQ06Fd5jyhPZbVrfi0eSVQJ+NpkLzizmLHDPp\r\n\tMFqerJ3vpB6etQ3cRaSFH+WXaKH2zzPjaK9TO9IoHBfsmYkza+ZOlwqGKeQX8FQSN3ViC/Ku5rp\r\n\tdytYRft9QZb9AHJ1rJTgoBbJzdpbqERHhnQIf7HASlwjqEudbjjVBNjmbPl2iP8QL166RSAtk9S\r\n\ttDr9o+uSS4okN5xDCDzDcQ1weJoL5zdmkvnoNnw=",
+            "mime-version": "MIME-Version: 1.0",
+            "from": "From: Pavithra Sadheesh Kumar <pavithrasadheeshkumar@gmail.com>",
+            "date": "Date: Thu, 19 Mar 2026 10:24:31 +0100",
+            "x-gm-features": "X-Gm-Features: AaiRm53aMqBukDSou19BjSeGsBWaQG46KtGxihdT2PAzPwOgDhMPHvZ0UWdqd-g",
+            "message-id": "Message-ID: <CAGyzKT-kEOkC8vxAQNyND6QxgpDea-ZXOkSqF8TMtHukF_pWBA@mail.gmail.com>",
+            "subject": "Subject: Immediate Assistance Required for Recent Purchase",
+            "to": "To: Pavithra Nagarajan <pavinp5@gmail.com>",
+            "content-type": "Content-Type: multipart/alternative; boundary=\"0000000000007139a2064d5d23b2\""
+          },
+          "html": "<div dir=\"ltr\"><p>Dear Customer Care Team,</p>\n<p>I recently purchased a product (Order Number: [Your Order Number]) and need immediate assistance. There appears to be an issue that requires urgent attention: [briefly describe the issue, e.g., damaged product, incorrect item, missing parts].</p>\n<p><strong>Details:</strong></p>\n<ul>\n<li>\n<p>Order Number: [Your Order Number]</p>\n</li>\n<li>\n<p>Purchase Date: [Date]</p>\n</li>\n<li>\n<p>Issue Description: [Explain clearly what went wrong]</p>\n</li>\n<li>\n<p>Photos/Attachments: [Attach if available]</p>\n</li>\n</ul>\n<p>Please advise on the next steps to resolve this issue promptly, including options for a replacement, refund, or return. I would greatly appreciate a response as soon as possible to avoid further delays.</p>\n<p>Thank you for your immediate attention to this matter</p></div>\n",
+          "text": "Dear Customer Care Team,\n\nI recently purchased a product (Order Number: [Your Order Number]) and need\nimmediate assistance. There appears to be an issue that requires urgent\nattention: [briefly describe the issue, e.g., damaged product, incorrect\nitem, missing parts].\n\n*Details:*\n\n   -\n\n   Order Number: [Your Order Number]\n   -\n\n   Purchase Date: [Date]\n   -\n\n   Issue Description: [Explain clearly what went wrong]\n   -\n\n   Photos/Attachments: [Attach if available]\n\nPlease advise on the next steps to resolve this issue promptly, including\noptions for a replacement, refund, or return. I would greatly appreciate a\nresponse as soon as possible to avoid further delays.\n\nThank you for your immediate attention to this matter\n",
+          "textAsHtml": "<p>Dear Customer Care Team,</p><p>I recently purchased a product (Order Number: [Your Order Number]) and need<br/>immediate assistance. There appears to be an issue that requires urgent<br/>attention: [briefly describe the issue, e.g., damaged product, incorrect<br/>item, missing parts].</p><p>*Details:*</p><p>   -</p><p>   Order Number: [Your Order Number]<br/>   -</p><p>   Purchase Date: [Date]<br/>   -</p><p>   Issue Description: [Explain clearly what went wrong]<br/>   -</p><p>   Photos/Attachments: [Attach if available]</p><p>Please advise on the next steps to resolve this issue promptly, including<br/>options for a replacement, refund, or return. I would greatly appreciate a<br/>response as soon as possible to avoid further delays.</p><p>Thank you for your immediate attention to this matter</p>",
+          "subject": "Immediate Assistance Required for Recent Purchase",
+          "date": "2026-03-19T09:24:31.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "pavinp5@gmail.com",
+                "name": "Pavithra Nagarajan"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Pavithra Nagarajan</span> &lt;<a href=\"mailto:pavinp5@gmail.com\" class=\"mp_address_email\">pavinp5@gmail.com</a>&gt;</span>",
+            "text": "\"Pavithra Nagarajan\" <pavinp5@gmail.com>"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "pavithrasadheeshkumar@gmail.com",
+                "name": "Pavithra Sadheesh Kumar"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Pavithra Sadheesh Kumar</span> &lt;<a href=\"mailto:pavithrasadheeshkumar@gmail.com\" class=\"mp_address_email\">pavithrasadheeshkumar@gmail.com</a>&gt;</span>",
+            "text": "\"Pavithra Sadheesh Kumar\" <pavithrasadheeshkumar@gmail.com>"
+          },
+          "messageId": "<CAGyzKT-kEOkC8vxAQNyND6QxgpDea-ZXOkSqF8TMtHukF_pWBA@mail.gmail.com>"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Convert to JSON": [
+      {
+        "json": {
+          "category": "refund",
+          "urgent": true
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clean the data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean the data": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Convert to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Database": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Vector Database",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Reply": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Log the entry in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert the Sales Team": {
+      "main": [
+        [
+          {
+            "node": "Log entry in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ctreate Ticket ": {
+      "main": [
+        [
+          {
+            "node": "Alert the Sales Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact from CRM": {
+      "main": [
+        [
+          {
+            "node": "Ctreate Ticket ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search contact in CRM": {
+      "main": [
+        [
+          {
+            "node": "Get Contact from CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a Ticket": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact from CRM": {
+      "main": [
+        [
+          {
+            "node": "Create a Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search contacts from CRM": {
+      "main": [
+        [
+          {
+            "node": "Get a contact from CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Routing the Urgent": {
+      "main": [
+        [
+          {
+            "node": "Search contact in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search contacts from CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to JSON": {
+      "main": [
+        [
+          {
+            "node": "Routing the Urgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a72bcf8d-a0a5-4651-b294-91fa0f5d0ae5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a0772e6290ec90909dc4521bfacde6b81688363f2edd371ddc6095fce4174ea"
+  },
+  "id": "O0kQ01PF25WHtG6z",
+  "tags": []
+}
