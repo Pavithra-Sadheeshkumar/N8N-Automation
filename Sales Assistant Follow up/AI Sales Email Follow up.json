@@ -1,0 +1,1153 @@
+{
+  "name": "AI Sales Email Follow up",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -640,
+        -160
+      ],
+      "id": "18c80418-01c7-4af0-a505-f1f56fa6b6f4",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -464,
+        -160
+      ],
+      "id": "dbd6351b-82c9-4bf6-b7e0-80c17bbd3ac1",
+      "name": "Wait 3 seconds",
+      "webhookId": "0a80a017-d864-4f14-895f-64bfbdbf5fcb"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "You are personalized Assistant that cleans email when you get a reply."
+            },
+            {
+              "role": "system",
+              "content": "=You are an Email Cleaning Assistant.\n\nYour task is to extract only the new message content written by the email sender and remove all unnecessary parts of the email.\n\nInput:{{ $json.text }}\n\nWhen processing an email, you must:\n1. Keep only the actual message written by the sender in their latest reply.\n2. Remove email threads, quoted previous messages, and forwarded content.\n3. Remove signatures, disclaimers, company footers, and contact details.\n4. Remove metadata such as \"From:\", \"Sent:\", \"To:\", \"Subject:\" and timestamps.\n5. Remove separators like \"-----Original Message-----\".\n6. Remove lines starting with \"On <date> <person> wrote:\".\n7. Remove repeated conversation history.\n8. Return only the clean message text written by the client.\n9.Remove breaks and new lines.\n10.Dont include any greeting like dear or Hi or any placeholders\n\n\nRules:\n- Do not summarize or rewrite the message.\n- Do not add or modify content.\n- Preserve the original wording of the sender.\n- If the email contains only thread content and no new message, return an empty response.\n\nOutput only the cleaned message text with no extra formatting"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        -160
+      ],
+      "id": "73074db2-fb96-434e-959f-df1abf01826e",
+      "name": "Client Response cleaner",
+      "credentials": {
+        "openAiApi": {
+          "id": "knhweLUXWDR0SurQ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        -160
+      ],
+      "id": "fa2a482d-4ec9-4465-9bd1-7acc11bfc98a",
+      "name": "Wait 2 seconds",
+      "webhookId": "0381e419-53af-4b85-a801-2243754830b3"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a helpful analyzing sentiment that classifies the client response email into sentiment analyis.i.e \n1.positive\n2.Neutral\n3.Negative"
+            },
+            {
+              "role": "system",
+              "content": "=\n##Overview \nYou are a Sentiment Analysis Assistant.\n\nYour task is to analyze a client's email response and classify its sentiment into one of the following categories:\n\n1. Positive\n2. Neutral\n3. Negative\n\nClient Response Email:{{ $json.output[0].content[0].text }}\n\n##Definitions:\n- Positive: The client shows interest, agreement, appreciation, or willingness to proceed (e.g., asking for more details, pricing, samples, scheduling a meeting, or expressing enthusiasm).\n- Neutral: The message is informational, unclear, or does not show clear interest or rejection (e.g., acknowledgements, requests for clarification without intent, automatic replies).\n- Negative: The client declines, rejects the offer, expresses disinterest, complaints, or clearly indicates they are not interested.\n\n##Instructions:\n- Carefully analyze the tone and intent of the email.\n- Focus on the client’s intent toward the proposal or business offer.\n- Ignore email signatures, disclaimers, and previous message threads if present.\n- Output only one label: Positive, Neutral, or Negative.\n- Do not include explanations unless explicitly requested.\n\nOutput format:\nOnly the label \"Positive\",\"Neutral\" or \"Negative\""
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        -160
+      ],
+      "id": "d46c37e1-3800-43e1-88f2-d14b3fc3f881",
+      "name": "Sentiment analysis",
+      "credentials": {
+        "openAiApi": {
+          "id": "knhweLUXWDR0SurQ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "Positive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8f9288cd-1531-4cdc-9c95-07e88e1a0a2d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Positive"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "00030153-d122-43ae-8b61-3e18fd21ffc9",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "Negative",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Negative"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b7b1d707-79ff-444a-bfa4-41c5e7027d45",
+                    "leftValue": "={{ $json.output[0].content[0].text }}",
+                    "rightValue": "Neutral",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Neutral"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -176
+      ],
+      "id": "3ea1fdb1-aebb-4308-b5da-496354ff37a8",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        -448
+      ],
+      "id": "26b78278-97f8-4d89-8310-80e7493f8bc4",
+      "name": "Wait 2 seconds1",
+      "webhookId": "755c6cf1-4c90-4285-b34b-2ee32a879585"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "You are a helpful email Assistant that writes friendly replies back to the client in a professional way and follow up"
+            },
+            {
+              "role": "system",
+              "content": "=##Overview \nYou are a Professional Email Assistant that generates business email replies in clean HTML format.\n\nYour task is to write clear, friendly, and professional email replies to clients who have responded with a positive reply.\n\nEMail Response:{{ $('Client Response cleaner').item.json.output[0].content[0].text }}\n\n##Responsibilities:\n1. Read and understand the client’s email.\n2. Write a polite and professional response.\n3. Maintain a friendly and respectful tone.\n4. Clearly address the client’s questions or comments.\n5. Encourage continued communication when appropriate.\n6. If the client has not taken action, include a gentle follow-up.\n7. Keep the message concise and easy to read.\n8.Sign of as Pavithra,AH Group.\n9.Dont include any greetins like \"Hi[Prospects Name]\" or any Placeholders.\n10.Do NOT include <html>, <head>, or <body> tags.\n11.Use <br> only for line breaks inside the signature and body of the email.\n12.Output must be HTML only.\n13.Split the email into short readable paragraphs.\n14.Each paragraph must be wrapped inside <p> tags\n##Guidelines:\n- Use professional business English.\n- Provide a clear response in the body.\n- End with a courteous closing.\n- Do not repeat long email threads or signatures.\n- Do not invent information that is not provided.\n\n\n##Email Structure:\nGreeting  \nResponse / Information  \nOptional follow-up or next step  \nProfessional closing\n\nOutput only the final email reply ready to send."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        -448
+      ],
+      "id": "11df614a-38a1-4b38-afeb-6a027644ed2f",
+      "name": "Positive Reply",
+      "credentials": {
+        "openAiApi": {
+          "id": "knhweLUXWDR0SurQ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        -176
+      ],
+      "id": "8bea9ede-4f27-4d98-847f-e70de3b645e2",
+      "name": "Wait 2 seconds2",
+      "webhookId": "755c6cf1-4c90-4285-b34b-2ee32a879585"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        128
+      ],
+      "id": "f8e9abc7-7656-4850-b300-8fcca7cf842d",
+      "name": "Wait 2 seconds3",
+      "webhookId": "755c6cf1-4c90-4285-b34b-2ee32a879585"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "You are a helpful email Assistant that writes friendly replies back to the client in a professional way and follow up"
+            },
+            {
+              "role": "system",
+              "content": "=##Overview \nYou are a Professional Email Assistant that generates business email replies in clean HTML format.\n\nYour task is to write clear, friendly, and professional email replies to clients who have responded with a negative reply.\n\nEMail Response:{{ $('Client Response cleaner').item.json.output[0].content[0].text }}\n\n##Responsibilities:\n1. Read and understand the client’s email.\n2.Write a clear, polite, and professional response to a client’s negative reply.\n3. Maintain a friendly and respectful tone.\n4. Acknowledge the client’s concerns or refusal.\n5.Offer helpful alternatives, additional information, or support if appropriate.\n6.Keep the reply concise, empathetic, and solution-oriented.\n7. Keep the message concise and easy to read.\n8.Sign of as Pavithra,AH Group.\n9.Dont include any greetins like \"Hi[Prospects Name]\" or any Placeholders.\n10.Do NOT include <html>, <head>, or <body> tags.\n11.Use <br> only for line breaks inside the signature and body of the email.\n12.Output must be HTML only.\n13.Split the email into short readable paragraphs.\n14.Each paragraph must be wrapped inside <p> tags.\n15.Encourage open communication without being pushy.\n16. Avoid arguments or defensive language.\n\n##Guidelines:\n- Use professional business English.\n- Provide a clear response in the body.\n- End with a courteous closing.\n- Do not repeat long email threads or signatures.\n- Do not invent information that is not provided.\n\n\n\nOutput only the final email reply ready to send."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1072,
+        -176
+      ],
+      "id": "1cb303f9-ed30-4d5d-97a9-0d6092b106aa",
+      "name": "Negative Reply",
+      "credentials": {
+        "openAiApi": {
+          "id": "knhweLUXWDR0SurQ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "You are a helpful email Assistant that writes friendly replies back to the client in a professional way and follow up"
+            },
+            {
+              "role": "system",
+              "content": "=You are a Professional Email Assistant specializing in replying to clients who have responded neutrally.\n\nYour task:\n- Write a clear, friendly, and professional response to a client’s neutral reply.\n- Maintain a polite and respectful tone.\n- Address any questions or requests in their message.\n- Provide useful information, clarification, or next steps as appropriate.\n- Encourage continued engagement without being pushy.\n- Keep the email concise, professional, and easy to read.\n\nEmail Formatting Rules:\n- Include a clear body responding to the client’s message.\n- Offer helpful follow-up or next steps if relevant.\n- End with a professional closing (e.g., \"Best regards,\" Pavithra,AH Group.\n- Do not include quoted email threads or signatures from the client.\n\nOutput:\n- Return only the final email text ready to send.\n- Ensure proper grammar, punctuation, and clear formatting."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1104,
+        128
+      ],
+      "id": "918fdf59-4ba6-4f45-acf4-df815c408459",
+      "name": "Neutral Reply",
+      "credentials": {
+        "openAiApi": {
+          "id": "knhweLUXWDR0SurQ",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1392,
+        -448
+      ],
+      "id": "9c97db0c-8694-4d2c-9848-a95ee1418a81",
+      "name": "Reply to a Positive response",
+      "webhookId": "a5817e6b-7c26-4d21-b6bc-b9f3539bf68a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1424,
+        -176
+      ],
+      "id": "98457c03-e14a-4954-af70-1e8e703c2106",
+      "name": "Reply to a negative response",
+      "webhookId": "a5817e6b-7c26-4d21-b6bc-b9f3539bf68a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        128
+      ],
+      "id": "e57237e8-ca3a-431b-a8c3-71bf3cc50f56",
+      "name": "Reply to a neutral response",
+      "webhookId": "a5817e6b-7c26-4d21-b6bc-b9f3539bf68a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appY3blj0DDHNwbrS",
+          "mode": "list",
+          "cachedResultName": "Follow Up Email",
+          "cachedResultUrl": "https://airtable.com/appY3blj0DDHNwbrS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbllU7oj4krgLf3bG",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appY3blj0DDHNwbrS/tbllU7oj4krgLf3bG"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "FullName": "={{ $('Gmail Trigger').item.json.from.value[0].name }}",
+            "Email": "={{ $('Gmail Trigger').item.json.from.value[0].address }}\n",
+            "Client Response": "={{ $('Client Response cleaner').item.json.output[0].content[0].text }}",
+            "Follow Up Email": "={{ $('Positive Reply').item.json.output[0].content[0].text }}",
+            "Status": "Positive"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "FullName",
+              "displayName": "FullName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client Response",
+              "displayName": "Client Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                },
+                {
+                  "name": "Positive",
+                  "value": "Positive"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Follow Up Email",
+              "displayName": "Follow Up Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Attachment Summary",
+              "displayName": "Attachment Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1600,
+        -448
+      ],
+      "id": "73517fa9-fa63-4fdd-893f-255a2156cadf",
+      "name": "Positive response log entry",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "9xC7QjvCgEofPJJQ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appY3blj0DDHNwbrS",
+          "mode": "list",
+          "cachedResultName": "Follow Up Email",
+          "cachedResultUrl": "https://airtable.com/appY3blj0DDHNwbrS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbllU7oj4krgLf3bG",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appY3blj0DDHNwbrS/tbllU7oj4krgLf3bG"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "FullName": "={{ $('Gmail Trigger').item.json.from.value[0].name }}",
+            "Email": "={{ $('Gmail Trigger').item.json.from.value[0].address }}\n",
+            "Client Response": "={{ $('Client Response cleaner').item.json.output[0].content[0].text }}",
+            "Follow Up Email": "={{ $('Negative Reply').item.json.output[0].content[0].text }}",
+            "Status": "Negative"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "FullName",
+              "displayName": "FullName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client Response",
+              "displayName": "Client Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                },
+                {
+                  "name": "Positive",
+                  "value": "Positive"
+                },
+                {
+                  "name": "Negative",
+                  "value": "Negative"
+                },
+                {
+                  "name": "Neutral",
+                  "value": "Neutral"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Follow Up Email",
+              "displayName": "Follow Up Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Attachment Summary",
+              "displayName": "Attachment Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1632,
+        -176
+      ],
+      "id": "2cca3a15-4644-4529-b40a-7313ba412ad0",
+      "name": "Negative response log entry",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "9xC7QjvCgEofPJJQ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appY3blj0DDHNwbrS",
+          "mode": "list",
+          "cachedResultName": "Follow Up Email",
+          "cachedResultUrl": "https://airtable.com/appY3blj0DDHNwbrS"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbllU7oj4krgLf3bG",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appY3blj0DDHNwbrS/tbllU7oj4krgLf3bG"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "FullName": "={{ $('Gmail Trigger').item.json.from.value[0].name }}",
+            "Email": "={{ $('Gmail Trigger').item.json.from.value[0].address }}\n",
+            "Client Response": "={{ $('Client Response cleaner').item.json.output[0].content[0].text }}",
+            "Follow Up Email": "={{ $('Neutral Reply').item.json.output[0].content[0].text }}",
+            "Status": "Neutral"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "FullName",
+              "displayName": "FullName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Client Response",
+              "displayName": "Client Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                },
+                {
+                  "name": "Positive",
+                  "value": "Positive"
+                },
+                {
+                  "name": "Negative",
+                  "value": "Negative"
+                },
+                {
+                  "name": "Neutral",
+                  "value": "Neutral"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Follow Up Email",
+              "displayName": "Follow Up Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Attachment Summary",
+              "displayName": "Attachment Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1664,
+        128
+      ],
+      "id": "84c7c277-db97-46b0-b1ca-99494832b0d4",
+      "name": "Neutral response log entry",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "9xC7QjvCgEofPJJQ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "19d00f769ca5b96a",
+          "threadId": "19d00f5ee693d06f",
+          "labelIds": [
+            "UNREAD",
+            "Label_1",
+            "IMPORTANT",
+            "CATEGORY_PERSONAL",
+            "INBOX"
+          ],
+          "sizeEstimate": 10617,
+          "headers": {
+            "delivered-to": "Delivered-To: pavinp5@gmail.com",
+            "received": "Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])\r\n        by mx.google.com with SMTPS id a640c23a62f3a-b97f145e69fsor81401666b.9.2026.03.18.05.41.47\r\n        for <pavinp5@gmail.com>\r\n        (Google Transport Security);\r\n        Wed, 18 Mar 2026 05:41:47 -0700 (PDT)",
+            "x-received": "X-Received: by 2002:a17:907:1b16:b0:b97:fbea:a618 with SMTP id\r\n a640c23a62f3a-b97fbeab94fmr157183866b.32.1773837706157; Wed, 18 Mar 2026\r\n 05:41:46 -0700 (PDT)",
+            "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; t=1773837706; cv=none;\r\n        d=google.com; s=arc-20240605;\r\n        b=IBXA0c3ucJUgcI8154iq6oxQjiQrLHzYOpV5ZofWVyya9tU22KFxFyfqPLFFxd45kz\r\n         Z5hgvDOCgmc7wdNZhRj/Dp8crEgqhwDexpdOvSl+iP2DcQR0ub8VNYHWOOoG7F4RVBkA\r\n         yVNmX9yrI3o5OM5XxRrXWL2rPQ+EKY60OMhv3V8TDgKK+7XSl+glqU7I6q4uPCCcW6un\r\n         ziQMhwrfD4CNDXg9T+ltfyfOZUBMxz/zmLD6mvU+VMPb091kUBHmr7gYvKmvjKDTWS47\r\n         fefO9sJozo0rAriKN7zq/lDc5bPk/E4KPLnk0SQLoP6iFVlHG3vVOn55Ze4tXAro3qwa\r\n         X/MQ==",
+            "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;\r\n        h=to:subject:message-id:date:from:in-reply-to:references:mime-version\r\n         :dkim-signature;\r\n        bh=sbDI1c2dtSKOjhqmHMiiRJVT8LqU8IZHjxre06o0QKc=;\r\n        fh=mqQigP2oqii2lWyOruGW+sszjYIMMoQ3tVe6vgafjks=;\r\n        b=R2De/o9PAhh9X8sNhFw8uiFxp5BQuvY3y/DDgMrSbqy+2cAjsx+pAWnhw+wyGHxXw5\r\n         tMiVLBvVH3ozhuJs4TFJpN4P/zzE5gFcfRD4sgcsfbJpf8+TGjUJDIF2f61NW1Tb2sJM\r\n         6k//B1JrY/To7VHl4nxoDn3LqKyKPpnzFfg/EXkqHCJQpSZQ1Gz9nAPfjdjXzv1H4yeS\r\n         eTNB6y0LfNm7uTbuCgwM9o8dAZZDANw6LQvyAWuyaU84mxuIyo+gPXHZEAacRWYuN8jV\r\n         A728+NXgVK8wmK8di2mU0DyzC8q9afirKJIb6Q2cllbDYNfG0wFNq7gWEMh+qp5z6X3u\r\n         vBzA==;\r\n        dara=google.com",
+            "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com; arc=none",
+            "return-path": "Return-Path: <sadheeshkumar.n@gmail.com>",
+            "received-spf": "Received-SPF: pass (google.com: domain of sadheeshkumar.n@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;",
+            "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=OTN0rhN6;\r\n       arc=pass (i=1);\r\n       spf=pass (google.com: domain of sadheeshkumar.n@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=sadheeshkumar.n@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+            "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=gmail.com; s=20230601; t=1773837706; x=1774442506; dara=google.com;\r\n        h=to:subject:message-id:date:from:in-reply-to:references:mime-version\r\n         :from:to:cc:subject:date:message-id:reply-to;\r\n        bh=sbDI1c2dtSKOjhqmHMiiRJVT8LqU8IZHjxre06o0QKc=;\r\n        b=OTN0rhN6+SwkbiaJp6jz7t9SOedaa6bYBGdH5dF7QT7fd6V0QIWZ5rMfGGFTswoCFW\r\n         ou1xxWYzzrpbeyXoQprhnSiMraWdsT1yyd6jkiGWkHLyqjoGzEl3FO1+BMf8iBJGWdhb\r\n         cYyrpgTXebQFstBHem85VHGN7gMPMhe0Wm2fFz3DUvNcKkpHmi4d93EKsIw5gI6EE/e3\r\n         eHqOTVy5BuuG616ucrqqB5ESntjQ6OTNZa6YHs0f+vEUzK6uojkLHL+OImHYaXadaslm\r\n         N4uCufAMKlh0/OgAW+Ec3QRwZc68gMDG2eeodtPc+GzZaNR7lr3nCHvjxh6DuQ1SgHPk\r\n         QHfA==",
+            "x-google-dkim-signature": "X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20251104; t=1773837706; x=1774442506;\r\n        h=to:subject:message-id:date:from:in-reply-to:references:mime-version\r\n         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id\r\n         :reply-to;\r\n        bh=sbDI1c2dtSKOjhqmHMiiRJVT8LqU8IZHjxre06o0QKc=;\r\n        b=b9Bsgs01AZ2SpYQpAbWpjS9DJ/00MwdL2NPCqN/zcRrOjOet+94VI6O0L0vlczNRew\r\n         ekIRA0htnTVH87ui2nerLfhbrrjC+fheA2SUhwQ6t+Ch0ZQaYILbAgsTSuzYMm3ayOfD\r\n         ZsLomwZy2m0QhuFFtCryOV0zwwU4RCvNX/hD/sgca8wWwQDM9jj/T+/TagZ3rs38nT5F\r\n         OgRvDlbCcTbUyLBuv7WRVGaAm84dyQC0o1Pl+7vqWklMjXuEymLo9zGpE/rVhER5EuFm\r\n         X/q1Yu2sr5lie4yWKGsd/R1f+/czSSeVQQrj59wfi3dbH22A/NNWSmdJN3wJ3eA9a5cf\r\n         bZ3A==",
+            "x-gm-message-state": "X-Gm-Message-State: AOJu0YxCKYcrIyBw0CJzdcOs5uuRB6EAerowuzV7PTnFThX3q8p68wzq\r\n\tM+2Ckz0jJu7NYKF6hSc2jEHazIMpmgJd46H3Nik4ID3mMubGe6ei6fl2YAOfaRRt16Koce1dkZy\r\n\tdWbLVrzPivUHeGU7VzjVnIk2hTolK/dSkKZHwQkCH3DGE",
+            "x-gm-gg": "X-Gm-Gg: ATEYQzyD28idu2zZwFcsuALjfgdF9TECeqewS9xZd7wuJ4u9Bqwa83yDHfwj3mv0gDW\r\n\t2guz9xui83d4blC6iHF9cTvxL2jzrp+vaKNq/6MF3+oEY9V6itVBjVBNx+F2AUF4YRAuH/f8KLK\r\n\tTOPQwEB/7koPPSTFI7XCX2eZFSSgb8w3aMqFQYjcbElomSnyl4jfIHAjEap6OWHwedI2Hg3B4ky\r\n\tJVeBWAfovO7g452CIXTv1VbPXL710ZQZNk8rfopvf7Am8UO6HZbxSjIKTeYlnoKl5C/6/4mVA8o\r\n\tTEdYQHDk0ZwqKHve/E1hRPUmO7djZDf47ReqkT8=",
+            "mime-version": "MIME-Version: 1.0",
+            "references": "References: <CAHVttJUiA2FxSLL-Vo0_opC2FqyJS49HH2ZD8VQaS=Le-BeQUA@mail.gmail.com>",
+            "in-reply-to": "In-Reply-To: <CAHVttJUiA2FxSLL-Vo0_opC2FqyJS49HH2ZD8VQaS=Le-BeQUA@mail.gmail.com>",
+            "from": "From: SADHEESH KUMAR NATARAJAN <sadheeshkumar.n@gmail.com>",
+            "date": "Date: Wed, 18 Mar 2026 13:41:33 +0100",
+            "x-gm-features": "X-Gm-Features: AaiRm5344xI5lM0nFkdChuCTnWCw_tIo4xGHpFqzwFTuT4Qeq74jHq6gf1zz5Po",
+            "message-id": "Message-ID: <CACvxW8niw5g_PUu+gXhaHzhUzm_zCp_tv8g875P6LDwA9nd9+A@mail.gmail.com>",
+            "subject": "Subject: =?UTF-8?Q?Re=3A_Introduction_of_Fabric_Supply_=E2=80=93_Cotton_and_Pol?=\r\n\t=?UTF-8?Q?y_Cotton_Fabrics_Inbox?=",
+            "to": "To: Pavithra Nagarajan <pavinp5@gmail.com>",
+            "content-type": "Content-Type: multipart/alternative; boundary=\"0000000000005d6237064d4bc6df\""
+          },
+          "html": "<div dir=\"ltr\"><p>Dear Ms. Pavithra Nagarajan,</p>\n<p>Thank you for reaching out and introducing your fabric products. We appreciate your offer and the detailed information provided.</p>\n<p>At this time, we are not looking to source new fabric suppliers, so we will not be able to proceed with your products. However, we will keep your details on file should our requirements change in the future.</p>\n<p>We wish you the best in your business endeavors.</p></div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">On Wed, Mar 18, 2026 at 1:40 PM Pavithra Nagarajan &lt;<a href=\"mailto:pavinp5@gmail.com\">pavinp5@gmail.com</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><div dir=\"ltr\"><div><br clear=\"all\"></div><div><p>Hallo Sadheesh,</p><p>I hope you are doing well.</p><p>My name is Pavithra Nagarajan, and I represent a textile raw material supply business. We specialize in supplying quality fabrics such as cotton and poly-cotton that can be used for manufacturing garments like frocks, pants, shirts, and other clothing products.</p><p>We would like to introduce our fabric range to your company and explore the possibility of working together. Our fabrics are suitable for garment production and can be supplied according to your requirements.</p><p>Please let us know if you are interested in purchasing fabrics from us. We would be happy to share more details about our products, samples, pricing, and delivery options.</p><p>Looking forward to your response and hoping for a potential business collaboration.</p><p>Best regards,<br>Pavithra Nagarajan</p></div></div>\n</blockquote></div>\n",
+          "text": "Dear Ms. Pavithra Nagarajan,\n\nThank you for reaching out and introducing your fabric products. We\nappreciate your offer and the detailed information provided.\n\nAt this time, we are not looking to source new fabric suppliers, so we will\nnot be able to proceed with your products. However, we will keep your\ndetails on file should our requirements change in the future.\n\nWe wish you the best in your business endeavors.\n\nOn Wed, Mar 18, 2026 at 1:40 PM Pavithra Nagarajan <pavinp5@gmail.com>\nwrote:\n\n>\n> Hallo Sadheesh,\n>\n> I hope you are doing well.\n>\n> My name is Pavithra Nagarajan, and I represent a textile raw material\n> supply business. We specialize in supplying quality fabrics such as cotton\n> and poly-cotton that can be used for manufacturing garments like frocks,\n> pants, shirts, and other clothing products.\n>\n> We would like to introduce our fabric range to your company and explore\n> the possibility of working together. Our fabrics are suitable for garment\n> production and can be supplied according to your requirements.\n>\n> Please let us know if you are interested in purchasing fabrics from us. We\n> would be happy to share more details about our products, samples, pricing,\n> and delivery options.\n>\n> Looking forward to your response and hoping for a potential business\n> collaboration.\n>\n> Best regards,\n> Pavithra Nagarajan\n>\n",
+          "textAsHtml": "<p>Dear Ms. Pavithra Nagarajan,</p><p>Thank you for reaching out and introducing your fabric products. We<br/>appreciate your offer and the detailed information provided.</p><p>At this time, we are not looking to source new fabric suppliers, so we will<br/>not be able to proceed with your products. However, we will keep your<br/>details on file should our requirements change in the future.</p><p>We wish you the best in your business endeavors.</p><p>On Wed, Mar 18, 2026 at 1:40&#x202F;PM Pavithra Nagarajan &lt;<a href=\"mailto:pavinp5@gmail.com\">pavinp5@gmail.com</a>&gt;<br/>wrote:</p><p>&gt;<br/>&gt; Hallo Sadheesh,<br/>&gt;<br/>&gt; I hope you are doing well.<br/>&gt;<br/>&gt; My name is Pavithra Nagarajan, and I represent a textile raw material<br/>&gt; supply business. We specialize in supplying quality fabrics such as cotton<br/>&gt; and poly-cotton that can be used for manufacturing garments like frocks,<br/>&gt; pants, shirts, and other clothing products.<br/>&gt;<br/>&gt; We would like to introduce our fabric range to your company and explore<br/>&gt; the possibility of working together. Our fabrics are suitable for garment<br/>&gt; production and can be supplied according to your requirements.<br/>&gt;<br/>&gt; Please let us know if you are interested in purchasing fabrics from us. We<br/>&gt; would be happy to share more details about our products, samples, pricing,<br/>&gt; and delivery options.<br/>&gt;<br/>&gt; Looking forward to your response and hoping for a potential business<br/>&gt; collaboration.<br/>&gt;<br/>&gt; Best regards,<br/>&gt; Pavithra Nagarajan<br/>&gt;</p>",
+          "subject": "Re: Introduction of Fabric Supply – Cotton and Poly Cotton Fabrics Inbox",
+          "references": "<CAHVttJUiA2FxSLL-Vo0_opC2FqyJS49HH2ZD8VQaS=Le-BeQUA@mail.gmail.com>",
+          "date": "2026-03-18T12:41:33.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "pavinp5@gmail.com",
+                "name": "Pavithra Nagarajan"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Pavithra Nagarajan</span> &lt;<a href=\"mailto:pavinp5@gmail.com\" class=\"mp_address_email\">pavinp5@gmail.com</a>&gt;</span>",
+            "text": "\"Pavithra Nagarajan\" <pavinp5@gmail.com>"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "sadheeshkumar.n@gmail.com",
+                "name": "SADHEESH KUMAR NATARAJAN"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">SADHEESH KUMAR NATARAJAN</span> &lt;<a href=\"mailto:sadheeshkumar.n@gmail.com\" class=\"mp_address_email\">sadheeshkumar.n@gmail.com</a>&gt;</span>",
+            "text": "\"SADHEESH KUMAR NATARAJAN\" <sadheeshkumar.n@gmail.com>"
+          },
+          "messageId": "<CACvxW8niw5g_PUu+gXhaHzhUzm_zCp_tv8g875P6LDwA9nd9+A@mail.gmail.com>",
+          "inReplyTo": "<CAHVttJUiA2FxSLL-Vo0_opC2FqyJS49HH2ZD8VQaS=Le-BeQUA@mail.gmail.com>"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 seconds": {
+      "main": [
+        [
+          {
+            "node": "Client Response cleaner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Response cleaner": {
+      "main": [
+        [
+          {
+            "node": "Wait 2 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2 seconds": {
+      "main": [
+        [
+          {
+            "node": "Sentiment analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment analysis": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Wait 2 seconds1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 2 seconds2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 2 seconds3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2 seconds1": {
+      "main": [
+        [
+          {
+            "node": "Positive Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Positive Reply": {
+      "main": [
+        [
+          {
+            "node": "Reply to a Positive response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2 seconds2": {
+      "main": [
+        [
+          {
+            "node": "Negative Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2 seconds3": {
+      "main": [
+        [
+          {
+            "node": "Neutral Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Negative Reply": {
+      "main": [
+        [
+          {
+            "node": "Reply to a negative response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Neutral Reply": {
+      "main": [
+        [
+          {
+            "node": "Reply to a neutral response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a Positive response": {
+      "main": [
+        [
+          {
+            "node": "Positive response log entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a negative response": {
+      "main": [
+        [
+          {
+            "node": "Negative response log entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a neutral response": {
+      "main": [
+        [
+          {
+            "node": "Neutral response log entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "966b663c-d17d-4572-ba9d-63784b47366d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a0772e6290ec90909dc4521bfacde6b81688363f2edd371ddc6095fce4174ea"
+  },
+  "id": "zwBa9ozzcWn9F5qQ",
+  "tags": []
+}
