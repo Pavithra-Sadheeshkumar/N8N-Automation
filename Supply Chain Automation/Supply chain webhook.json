@@ -1,0 +1,915 @@
+{
+  "name": "Supply chain webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "78b13d3e-f0a0-4bb7-bff3-4914683fc0ce",
+              "leftValue": "={{ $json.headers.document_type }}",
+              "rightValue": "EDI",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1216,
+        -48
+      ],
+      "id": "c71bbefc-2943-49d0-82c0-238a87c60622",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4470041f-ae87-471b-afd3-4f32b2feec56",
+              "name": "text",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -800,
+        -144
+      ],
+      "id": "a72e692b-b8ce-4c36-948c-d63c9f1b488f",
+      "name": "Extract body"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a helpful EDI Translator.\n\nEDI text :{{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=##Overview:\n\nYou are an expert EDI Parser and Data Integrator. Your task is to extract raw EDI text from email bodies and convert it into a clean, structured JSON format.\n\nEDI Text:{{ $json.text }}\n\n##Task Instructions:\n\nIdentify Document Type: \nDetermine if the message is a Purchase Order (e.g., EDI 850) or a Return/Adjustment (e.g., EDI 860/180) or a Order Cancellation(EDI 860)\n\nSegment Mapping:\n\nEDIFACT Mapping Rules:\n\nIdentify Buyer (Bill To): Look for the NAD+BY segment. The ID following it (e.g., 5412345000013) is the GLN/ID for the Buyer.\n\nIdentify Supplier: Look for the NAD+SU segment.\n\nExtract Line Items:\n\nLIN: Start of a new line item. The value after the second + (e.g., ABC123) is the SKU/Product ID.\n\nIMD: Look here for the Item Description (e.g., Laptop Computer).\nBill To (Buyer): Extract the ID found in the NAD+BY segment. If no name is present, return the ID as buyer_id.\n\nSupplier: Extract the ID from the NAD+SU segment.\n\nQTY: The number after the : (e.g., 100) is the Quantity.\n\nPRI: The value after the second : (e.g., 800) is the Unit Price.\n\nCurrency: Look for the CUX segment (e.g., EUR).\nInitialize grand_total = 0.\n\nFor EVERY LIN (Line Item) segment:\n\nIdentify the QTY value (the number after the second + and colon).\n\nIdentify the PRI value (the number after the second + and colon).\n\nCalculate line_item_total = quantity * unit_price.\n\nAdd line_item_total to grand_total.\n\nReturn the grand_total as the final amount. Do not simply add all numeric values found in the text\n\nIf an explicit total segment exists (e.g., MOA+128), compare it to your calculation. If they differ, flag it in a metadata.warnings field.\n\nOrder Change & Cancellation Logic:\n\nIdentify Message Type: If the UNH segment contains ORDCHG, set the transaction_category to \"Modification\".\n\nDetect Full Cancellation: Look at the BGM segment. If the code is 105 followed by a 1 (e.g., BGM+105+PO123456+1), this is a FULL CANCELLATION. Set order_status to \"CANCELLED\".\n\nLine Item Deletion: In the LIN segment, if the second value is 5 (e.g., LIN+1+5), this specific line item is being deleted. Set the item_status to \"VOID\" and quantity to 0.\n\nReason for Cancellation: Extract text from the FTX+LIN or FTX+ORC segments to populate a cancellation_reason field.\n\nOutput Requirement: Always include the original_po_number from the BGM or DOC segment so the system knows which row to update in Google Sheets.\n\nValidation: Ensure all dates are converted to YYYY-MM-DD format and all currency values are returned as numbers, not strings.\n\nOutput Format: Return ONLY a valid JSON object. Do not include conversational text, explanations, or markdown code blocks unless requested.\n\nEdge Case Handling:\n\nIf a segment is missing or corrupted, skip it but continue parsing the rest of the document.\n\nIf the document type is ambiguous, add a field \"metadata\": {\"warning\": \"Unknown EDI Type\"}.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -592,
+        -144
+      ],
+      "id": "1f47a94f-52ab-47b6-ba58-ed1713819407",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -720,
+        64
+      ],
+      "id": "f1a345a2-466c-4564-aeca-d2c43478b4a9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "4udR7cdjb6vWxSJG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"document_type\": \"Purchase Order | Return Order\",\n  \"order_header\": {\n    \"order_number\": \"string\",\n    \"order_date\": \"YYYY-MM-DD\",\n    \"currency\": \"string\"\n  },\n  \"parties\": {\n    \"bill_to\": { \"name\": \"string\", \"address\": \"string\" },\n    \"ship_to\": { \"name\": \"string\", \"address\": \"string\" }\n  },\n  \"line_items\": [\n    {\n      \"sku\": \"string\",\n      \"quantity\": 0,\n      \"unit_price\": 0.00,\n      \"description\": \"string\",\n      \"return_reason_code\": \"string (optional)\"\n    \n    }\n  ],\n  \"total_cost\":0.00,\n  \"total_items\":0\n  \n \n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        64
+      ],
+      "id": "c41025e9-ec5b-45f8-9c15-da515cd2c708",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.line_items",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -144
+      ],
+      "id": "c7c4cb2b-b43a-4a2b-b6db-55deea61e169",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo",
+          "mode": "list",
+          "cachedResultName": "Supply chain",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order Type": "={{ $json.output.document_type }}",
+            "Order Date": "={{ $json.output.order_header.order_date }}",
+            "Order Number": "={{ $json.output.order_header.order_number }}",
+            "Bill to": "={{ $json.output.parties.bill_to.name }}",
+            "Ship to": "={{ $json.output.parties.ship_to.name }}",
+            "Unit Price": "={{ $json['output.line_items'].unit_price }}",
+            "Quantity": "={{ $json['output.line_items'].quantity }}",
+            "Product Description": "={{ $('Split Out').item.json['output.line_items'].description }}",
+            "SKU": "={{ $json['output.line_items'].sku }}",
+            "Status": "Shipped",
+            "Reason for order cancellation": "-"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order Type",
+              "displayName": "Order Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Number",
+              "displayName": "Order Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SKU",
+              "displayName": "SKU",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Bill to",
+              "displayName": "Bill to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ship to",
+              "displayName": "Ship to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Product Description",
+              "displayName": "Product Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Unit Price",
+              "displayName": "Unit Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reason for order cancellation",
+              "displayName": "Reason for order cancellation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        -240
+      ],
+      "id": "4979e712-f5d8-49f6-b7bb-707bd4c150a2",
+      "name": "Purchase Order Entry",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cex9MVWLvpbGa8FL",
+          "name": "Pavinp5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.document_type }}",
+                    "rightValue": "Purchase Order",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2e3ac1ff-3c5c-47c2-9642-7d118e42d922"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Purchase Order"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5ba7a77e-2fdb-4c8f-86e7-a6319a4fe923",
+                    "leftValue": "={{ $json.output.document_type }}",
+                    "rightValue": "Return/Adjustment (RETANN)",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "=Return Order"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "293dd375-60e0-4a78-b8c8-1dabd0f568d4",
+                    "leftValue": "={{ $json.output.document_type }}",
+                    "rightValue": "Order Cancellation (EDI 860)",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Order Cancellation"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -32,
+        -144
+      ],
+      "id": "4dcc8808-4be1-4299-b218-df6058713f3d",
+      "name": "Routing Rules"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo",
+          "mode": "list",
+          "cachedResultName": "Supply chain",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Purchase Order",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "=Order Number",
+              "lookupValue": "={{ $json.output.order_header.order_number }}"
+            },
+            {
+              "lookupColumn": "SKU",
+              "lookupValue": "={{ $json['output.line_items'].sku }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        160
+      ],
+      "id": "499ce04a-d80c-4959-afc4-ef598e7f09be",
+      "name": "Get rows from CRM",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cex9MVWLvpbGa8FL",
+          "name": "Pavinp5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo",
+          "mode": "list",
+          "cachedResultName": "Supply chain",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1556472020,
+          "mode": "list",
+          "cachedResultName": "Return Order",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo/edit#gid=1556472020"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order Type": "={{ $json.output.document_type }}",
+            "Order Number": "={{ $json.output.order_header.order_number }}",
+            "Order Date": "={{ $json.output.order_header.order_date }}",
+            "Bill to": "={{ $json.output.parties.bill_to.name }}",
+            "Ship to": "={{ $json.output.parties.ship_to.name }}",
+            "Unit Price": "={{ $json['output.line_items'].unit_price }}",
+            "Quantity": "={{ $json['output.line_items'].quantity }}",
+            "Reason for return": "={{ $json['output.line_items'].return_reason_code }}",
+            "Product Description": "={{ $json['output.line_items'].description }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order Type",
+              "displayName": "Order Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Number",
+              "displayName": "Order Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Bill to",
+              "displayName": "Bill to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ship to",
+              "displayName": "Ship to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Product Description",
+              "displayName": "Product Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Unit Price",
+              "displayName": "Unit Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason for return",
+              "displayName": "Reason for return",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        -48
+      ],
+      "id": "75325eaa-8ddf-425d-b7f0-e0dc8add5b01",
+      "name": "CRM Return Order Entry",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cex9MVWLvpbGa8FL",
+          "name": "Pavinp5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo",
+          "mode": "list",
+          "cachedResultName": "Supply chain",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Purchase Order",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "Order Type": "={{ $('Routing Rules').item.json.output.document_type }}",
+            "Order Number": "={{ $json['Order Number'] }}",
+            "Order Date": "={{ $json['Order Date'] }}",
+            "SKU": "={{ $json.SKU }}",
+            "Bill to": "={{ $json['Bill to'] }}",
+            "Ship to": "={{ $json['Ship to'] }}",
+            "Product Description": "={{ $json['Product Description'] }}",
+            "Unit Price": "={{ $json['Unit Price'] }}",
+            "Quantity": "={{ $json.Quantity }}",
+            "Reason for order cancellation": "={{ $('Routing Rules').item.json['output.line_items'].return_reason_code }}",
+            "Status": "Cancelled"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Order Type",
+              "displayName": "Order Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Number",
+              "displayName": "Order Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SKU",
+              "displayName": "SKU",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Bill to",
+              "displayName": "Bill to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ship to",
+              "displayName": "Ship to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Product Description",
+              "displayName": "Product Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Unit Price",
+              "displayName": "Unit Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason for order cancellation",
+              "displayName": "Reason for order cancellation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        160
+      ],
+      "id": "7f951e26-ad67-47be-a43a-27e0e6cbaabe",
+      "name": "CRM Update Cancellation entry",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cex9MVWLvpbGa8FL",
+          "name": "Pavinp5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U0AM1KJP0BC",
+          "mode": "list",
+          "cachedResultName": "pavithrasadheeshkumar"
+        },
+        "text": "=Hello ,\n\nAn order has been cancelled with Order Number:{{ $json['Order Number'] }} and SKU :{{ $json.SKU }}\n\nHave updated the CRM with Cancelled status.\n\nLink:\n\n\nhttps://docs.google.com/spreadsheets/d/1Aj8BGipXfmFJUVNn8mnQRgpq113SRb9YjCbCaCkqaNo/edit?gid=0#gid=0",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        608,
+        160
+      ],
+      "id": "1d78c18b-7160-4d54-9d34-130f27443a12",
+      "name": "Send a message",
+      "webhookId": "62b03c29-ffdb-4ebb-b55d-0a40323e5428",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "MtxAU9MwR0VEzbNT",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "61e1e911-a043-4345-8fce-cb09a04b0672",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1440,
+        -48
+      ],
+      "id": "aac117f9-4833-4581-991a-58eb34672edb",
+      "name": "Webhook",
+      "webhookId": "61e1e911-a043-4345-8fce-cb09a04b0672"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Extract body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract body": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Routing Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Routing Rules": {
+      "main": [
+        [
+          {
+            "node": "Purchase Order Entry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CRM Return Order Entry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get rows from CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get rows from CRM": {
+      "main": [
+        [
+          {
+            "node": "CRM Update Cancellation entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM Update Cancellation entry": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a6dfdaf7-bd56-4da2-8195-ab7de806f565",
+  "meta": {
+    "instanceId": "1a0772e6290ec90909dc4521bfacde6b81688363f2edd371ddc6095fce4174ea"
+  },
+  "id": "3xT9HzDvp8iPAYNh",
+  "tags": []
+}
