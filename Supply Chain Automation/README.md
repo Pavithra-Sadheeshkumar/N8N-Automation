@@ -75,6 +75,9 @@ The **Switch Node** routes the processed data based on the identified `document_
     %% Styling
     style E fill:#f9f,stroke:#333,stroke-width:2px
 
+    style I fill:#bbf,stroke:#333,stroke-width:2px
+    style N fill:#8f8,stroke:#333,stroke-width:2px
+
 ```
 
 ## 🛠️ Tech Stack
@@ -87,5 +90,9 @@ The **Switch Node** routes the processed data based on the identified `document_
 * **Protocol Support**: **Webhook** (POST method)
 
 
-    style I fill:#bbf,stroke:#333,stroke-width:2px
-    style N fill:#8f8,stroke:#333,stroke-width:2px
+## Screenshots
+
+
+<img width="1596" height="718" alt="image" src="https://github.com/user-attachments/assets/d4884b94-4674-4183-8aae-8ef8668f6eeb" />
+
+
