@@ -89,10 +89,16 @@ The **Switch Node** routes the processed data based on the identified `document_
 * **Communication**: **Slack** (Real-time notifications)
 * **Protocol Support**: **Webhook** (POST method)
 
+## 📸 Visualizing the Output
 
-## Screenshots
-
-
+### 1. Workflow Execution
 <img width="1596" height="718" alt="image" src="https://github.com/user-attachments/assets/d4884b94-4674-4183-8aae-8ef8668f6eeb" />
+
+### 2. CRM Data (Google Sheets)
+![Google Sheets Output](./screenshots/google_sheets_rows.png)
+
+### 3. Slack Notifications (Cancellations)
+![Slack Alert Example](./screenshots/slack_notification.png)
+
 
 
