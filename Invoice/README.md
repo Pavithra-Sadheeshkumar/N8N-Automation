@@ -62,3 +62,26 @@ Finally, the AI drafts a JSON-formatted email subject and body. This is sent to 
 * **Configuration**:
     * Update the **Google Drive Trigger** with the specific Folder ID.
     * Update the **Google Sheets** node with the URL of the tracking spreadsheet.
+ 
+## 📸 Visualizing the Output
+
+### 1. Workflow Execution
+
+<img width="1600" height="721" alt="image" src="https://github.com/user-attachments/assets/fd22a550-4ea5-4d8d-a5a8-e9ea264d8b56" />
+
+
+### 2. Attribute extraction using Open AI
+
+<img width="1828" height="740" alt="image" src="https://github.com/user-attachments/assets/2fb998b5-2f33-4953-b52b-38b1fcb62fc1" />
+
+### 3. Appending the Information to Google sheets
+
+<img width="1879" height="630" alt="image" src="https://github.com/user-attachments/assets/78a86f09-37b9-4b6e-9818-2bf63398b137" />
+
+### 4.Using AI to send notification to billing team
+
+<img width="1482" height="667" alt="image" src="https://github.com/user-attachments/assets/bea869ac-a68c-44ea-98e2-341edc389360" />
+
+
+
+
