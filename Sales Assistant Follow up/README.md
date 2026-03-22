@@ -37,7 +37,7 @@ graph TD
 ## 🛠️ Tech Stack
 
 * **Automation Engine**: [n8n.io](https://n8n.io/)
-* **AI Models**: OpenAI GPT-4.1-mini (via LangChain)
+* **AI Models**: OpenAI GPT-4.1-mini 
 * **Communication**: Gmail (OAuth2)
 * **CRM/Database**: Airtable
 * **Logic**: n8n Switch & Wait nodes for natural timing
@@ -70,3 +70,42 @@ The response is sent as a direct reply to the original Gmail thread. Finally, th
     * **Airtable**: Connect your Personal Access Token and select your target Base/Table.
 
 * **Airtable Fields**: Ensure your table includes columns for `FullName`, `Email`, `Client Response`, `Follow Up Email`, and `Status`.
+
+
+## 📸 Visualizing the Output
+
+### 1. Workflow Execution
+
+<img width="1643" height="737" alt="image" src="https://github.com/user-attachments/assets/b2cfcc89-6a3c-4e1f-bfaa-2d6c8e7531d9" />
+
+
+### 2.Email sent from sales team to Lead 
+
+<img width="1422" height="646" alt="image" src="https://github.com/user-attachments/assets/54e7f173-ff3c-4da4-84ca-5ebb51a362c0" />
+
+### 3.Cleaner Response Email (Using AI)
+
+<img width="1341" height="685" alt="image" src="https://github.com/user-attachments/assets/ed8ea1b4-82ae-4805-86fe-c369a290d526" />
+
+
+### 4.Using AI for Sentiment Analysis
+
+<img width="1213" height="707" alt="image" src="https://github.com/user-attachments/assets/399d837b-4d9b-4105-9f6a-fc943dd00ab4" />
+
+### 5.Generating automatic Follow up email using AI and sending using Gmail
+
+<img width="1527" height="431" alt="image" src="https://github.com/user-attachments/assets/fcae693e-233e-48e3-a998-7d630c30e931" />
+
+### 6.Logging the entry into Airtable
+
+<img width="1857" height="702" alt="image" src="https://github.com/user-attachments/assets/1ebcf241-62a1-4b2a-ad23-da1f1acad147" />
+
+
+
+
+
+
+
+
+
+
