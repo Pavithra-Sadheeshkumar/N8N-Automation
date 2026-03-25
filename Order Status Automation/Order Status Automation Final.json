@@ -1,0 +1,2656 @@
+{
+  "name": "Order Status Automation Final",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -160
+      ],
+      "id": "39d5241e-1f7f-4ec1-897e-b4e142f37088",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        -160
+      ],
+      "id": "ca239afd-ca2e-4e46-86f0-8d74d3d67d4f",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.order_status }}",
+                    "rightValue": "Pending",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "77c74be7-c502-43ff-abf2-3a1fb459cf55"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Pending Orders"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c72e49f0-83b1-4366-983c-27a55ab947d8",
+                    "leftValue": "={{ $json.order_status }}",
+                    "rightValue": "Refunded",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Refunded Orders"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a76789df-309e-4af2-a406-774efd2a114c",
+                    "leftValue": "={{ $json.order_status }}",
+                    "rightValue": "Processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Processing Orders"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a3984518-e5d5-4eb8-afd8-746878d11944",
+                    "leftValue": "={{ $json.order_status }}",
+                    "rightValue": "Shipped",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Shipped Orders"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cf5aa63e-1140-4de0-8f89-738397aedee7",
+                    "leftValue": "={{ $json.order_status }}",
+                    "rightValue": "Delivered",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Delivered Orders"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f91508bb-e4f0-41c7-915f-bb8fe862b641",
+                    "leftValue": "={{ $json.order_status }}",
+                    "rightValue": "Cancelled",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cancelled Orders"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d83fc8d5-243b-41f7-8784-cd3c4ef208b2",
+                    "leftValue": "={{ $json.order_status }}",
+                    "rightValue": "Ready for Pickup",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ready for Pickup"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        -240
+      ],
+      "id": "6d135ff9-cc0b-4e24-ae16-41fc8827407b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "=Gentle Remainder To pay for the order no : {{ $json.order_id }}",
+        "message": "=Dear {{ $json.first_name }},\n\nWe hope you are doing well.\n\nThis is a gentle reminder that payment for your order {{ $json.order_id }} is still pending. To proceed with processing and shipping your order, please complete the payment at your earliest convenience.\n\nOnce the payment is successfully received, we will immediately begin processing your order and keep you updated on the shipping status.\n\nIf you have already completed the payment, please ignore this message.\n\nShould you need any assistance or have questions regarding your order, feel free to contact our support team.\n\nBest regards,\nCustomer Support Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        -448
+      ],
+      "id": "e3cd2bf5-8d1e-4117-9e2a-879de8f53c60",
+      "name": "Remainder Email",
+      "webhookId": "832bf528-9f9f-4539-940e-55606d887881",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U0AM1KJP0BC",
+          "mode": "list",
+          "cachedResultName": "pavithrasadheeshkumar"
+        },
+        "text": "=Order ID {{ $('Switch').item.json.order_id }} is in Pending Status for long time.\n\nRemainder Email has been sent to the Customer.\n\nIf Payment is not done in within 24 hrs order will be auto cancelled.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        544,
+        -448
+      ],
+      "id": "2dd0c88f-b9ff-459c-89a3-ff8163a8a4ab",
+      "name": "Notify Payment team",
+      "webhookId": "8b932120-5a81-446e-a8c6-7e86544e2e21",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "MtxAU9MwR0VEzbNT",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Switch').item.json.customer_email }}",
+        "subject": "=Gentle Remainder To pay for the order no :{{ $('Get row(s) in sheet').item.json.order_id }} ",
+        "message": "=Dear {{ $('Switch').item.json.first_name }},\nWe hope you are doing well.\n\nThis is a second reminder regarding your order {{ $('Get row(s) in sheet').item.json.order_id }}, which is currently awaiting payment.\n\nTo avoid cancellation, please complete the payment within 24 hours of placing the order. If the payment is not received within this time frame, the order will be automatically cancelled.\n\nYou can complete your payment using the link below:\n\nPayment Link: \n\nIf you have already completed the payment, please ignore this message.\n\nIf you need any assistance, feel free to contact our support team. We are happy to help.\n\nBest regards,\nCustomer Support Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1216,
+        -448
+      ],
+      "id": "1fd7d981-febd-4c00-9359-d5d65e2b3c5f",
+      "name": "Remainder Email1",
+      "webhookId": "832bf528-9f9f-4539-940e-55606d887881",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1484896696,
+          "mode": "list",
+          "cachedResultName": "Payment Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=1484896696"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "order_status",
+              "lookupValue": "Pending"
+            },
+            {
+              "lookupColumn": "Payment Status",
+              "lookupValue": "Unpaid"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1440,
+        -448
+      ],
+      "id": "e89dbfba-4b48-4db4-9656-4ca98099029c",
+      "name": "Get Payment details",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getTimeBetweenDates",
+        "startDate": "={{ $json.order_date }}",
+        "endDate": "={{ $now.toFormat('yyyy-MM-dd H:mm:ss') }}",
+        "units": [
+          "hour"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        -448
+      ],
+      "id": "a78f1237-7093-4c47-94aa-3574502b2a11",
+      "name": "Calculate time diffrence"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d0a53ac3-5505-4a0b-b25a-5677e3fbc568",
+              "leftValue": "={{ $json.timeDifference.hours }}",
+              "rightValue": 24,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2112,
+        -448
+      ],
+      "id": "08011f43-5f56-4fea-bbd7-e0bd00261504",
+      "name": "Time difference > 24"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $('Get order details').item.json.order_id }}",
+            "first_name": "={{ $('Get order details').item.json.first_name }}",
+            "last_name": "={{ $('Get order details').item.json.last_name }}",
+            "customer_email": "={{ $('Get order details').item.json.customer_email }}",
+            "order_status": "Cancelled",
+            "order_date": "={{ $('Get order details').item.json.order_date }}"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_status",
+              "displayName": "order_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2336,
+        -448
+      ],
+      "id": "47992bb2-4c6d-42e9-9455-50f2be97c8b1",
+      "name": "Update the status(cancel)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "=Order No : {{ $json.order_id }} Cancelled due to pending payment",
+        "message": "=Dear {{ $json.first_name }},\n\nWe hope you are doing well.\n\nSince we did not receive the payment for your order {{ $json.order_id }} within 24 hours of placing the order, the order has now been automatically cancelled.\n\nIf you still wish to purchase the items, you are welcome to place a new order at any time through our website.\n\nIf you believe this cancellation was made in error or if you have any questions, please feel free to contact our support team and we will be happy to assist you.\n\nThank you for your understanding.\n\nBest regards,\nCustomer Support Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2560,
+        -448
+      ],
+      "id": "071c3197-decb-404c-b1e7-28ea88d4c297",
+      "name": "Notify the Customer",
+      "webhookId": "aae1f99f-3ac5-45c0-9425-fcae8031c73b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U0AM1KJP0BC",
+          "mode": "list",
+          "cachedResultName": "pavithrasadheeshkumar"
+        },
+        "text": "=Order No {{ $('Update the status(cancel)').item.json.order_id }}: Cancelled due to pending payment after 24 hrs and same has been updated in the Sample Order Data Dataabse.\n\nLink:https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?gid=0#gid=0",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        2784,
+        -448
+      ],
+      "id": "e1e0533d-220f-4d82-a2ce-69b20745770b",
+      "name": "Notify the Team",
+      "webhookId": "c7c6d046-5628-4e4b-bd29-9bfd80903819",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "MtxAU9MwR0VEzbNT",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "24dccd8f-6674-4196-b5c0-7a3da0ac2a22",
+              "leftValue": "={{ $json.timeDifference.hours }}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        992,
+        -448
+      ],
+      "id": "51514ba1-daeb-4f53-9707-9a2c736bd822",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "getTimeBetweenDates",
+        "startDate": "={{ $('Get row(s) in sheet').item.json.order_date }}",
+        "endDate": "={{ $now.toFormat('yyyy-MM-dd H:mm:ss') }}",
+        "units": [
+          "hour"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        768,
+        -448
+      ],
+      "id": "b05e5916-e2f7-49cc-8c86-77cfa0eec63a",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "Your Order Has Been Shipped 🚚",
+        "message": "=Hi {{ $json.first_name }},\n\nGood news! Your order {{ $json.order_id }}  has been shipped and is on its way.\n\n📦 Tracking Details:\n\nCarrier: DHL\nTracking Number: {{ $json['Tracking Number'] }}\nTrack your package: {{ $json['Tracking URL'] }}\n\nYou can use the tracking link above to follow your shipment in real time.\n\nIf you have any questions, feel free to reply to this email — we’re happy to help!\n\nThank you for shopping with us 😊\n\nBest regards,\nShipping Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        144
+      ],
+      "id": "0f1bf985-e5cf-4157-928e-e3261041244b",
+      "name": "send Tracking URL to Customer",
+      "webhookId": "bfcfd980-c249-4131-acd9-e554802fd69d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AN20GRBEK",
+          "mode": "list",
+          "cachedResultName": "logistics-channe"
+        },
+        "text": "=Hello\n\nBelow order Number are ready for Pickup\n\n{{ $json.order_id }}\n\nPlease arrange for DHL Pickup.\n\n\nThanks,\nWarehouse Team",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        640,
+        768
+      ],
+      "id": "c65d57f5-98e4-451a-a8e5-2b0972db23b0",
+      "name": "Notify Logistics Team",
+      "webhookId": "989b4147-7113-496c-861b-6cfef08799ab",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "MtxAU9MwR0VEzbNT",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ANMQ0PZU1",
+          "mode": "list",
+          "cachedResultName": "processing-channel"
+        },
+        "text": "=Hey there is a new order {{ $json.order_id }} in priority  Processing state.Please start the process for packing.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        752,
+        -32
+      ],
+      "id": "e8189304-bdcd-4bcd-84d8-7df1ea1a6d87",
+      "name": "Notify warehouse Team",
+      "webhookId": "adc44cbe-d74e-4abf-aa40-a31da10404b2",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "MtxAU9MwR0VEzbNT",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workspace": "1213796631112529",
+        "name": "Pack the Orders",
+        "otherProperties": {
+          "assignee": "1213765664447757",
+          "due_on": "={{ $now.plus(1,'days') }}",
+          "notes": "=Pack the orders for ordr id :{{ $('Switch').item.json.order_id }}",
+          "projects": [
+            "1213765664262616"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.asana",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        -32
+      ],
+      "id": "21c5b605-0dc0-4fad-b65a-df87490d3255",
+      "name": "Task for Packing Order",
+      "credentials": {
+        "asanaApi": {
+          "id": "VSFv1a2x1DbSDFO0",
+          "name": "Access token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Notification Sent": "Yes",
+            "first_name": "={{ $('Switch').item.json.first_name }}",
+            "order_id": "={{ $('Switch').item.json.order_id }}",
+            "last_name": "={{ $('Switch').item.json.last_name }}",
+            "customer_email": "={{ $('Switch').item.json.customer_email }}",
+            "order_status": "={{ $('Switch').item.json.order_status }}",
+            "order_date": "={{ $('Switch').item.json.order_date }}",
+            "Tracking URL": "={{ $('Switch').item.json['Tracking URL'] }}",
+            "Tracking Number": "={{ $('Switch').item.json['Tracking Number'] }}"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_status",
+              "displayName": "order_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking URL",
+              "displayName": "Tracking URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking Number",
+              "displayName": "Tracking Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notification Sent",
+              "displayName": "Notification Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        912,
+        144
+      ],
+      "id": "871a5dad-af00-416c-9046-e2acc19075ed",
+      "name": "Update the notification",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $('Switch').item.json.order_id }}",
+            "first_name": "={{ $('Switch').item.json.first_name }}",
+            "last_name": "={{ $('Switch').item.json.last_name }}",
+            "customer_email": "={{ $('Switch').item.json.customer_email }}",
+            "order_status": "={{ $('Switch').item.json.order_status }}",
+            "order_date": "={{ $('Switch').item.json.order_date }}",
+            "Notification Sent": "yes"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_status",
+              "displayName": "order_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking URL",
+              "displayName": "Tracking URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking Number",
+              "displayName": "Tracking Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notification Sent",
+              "displayName": "Notification Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        784
+      ],
+      "id": "64a9a275-943a-48e9-96b2-3e94e2243de7",
+      "name": "Update Notification",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ANEQ9F31T",
+          "mode": "list",
+          "cachedResultName": "finance-team"
+        },
+        "text": "=Hey  {{ $('Inventory Updation notified').item.json.order_id }} has been cancelled and stocks has been updated in the inventory database.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        2112,
+        560
+      ],
+      "id": "82208ed4-e095-4176-81cd-a211d797b9cb",
+      "name": "Notify Finance team",
+      "webhookId": "555af94d-3ca4-4125-a8fd-5e6b9a5270ce",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "MtxAU9MwR0VEzbNT",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "=Order ID : {{ $json.order_id }} Cancelled",
+        "message": "=Hello {{ $json.first_name }},\n\nYour Order Id : {{ $json.order_id }} has been cancelled.\n\n\nRegards,\nCustomer Service Team\n\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1904,
+        560
+      ],
+      "id": "575c4090-896e-46ba-bba6-77465f4cd304",
+      "name": "Notify Customer",
+      "webhookId": "79442bd5-9a64-47db-a20c-10833656290a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1362382330,
+          "mode": "list",
+          "cachedResultName": "Order data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=1362382330"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "order_id",
+              "lookupValue": "={{ $('Switch').item.json.order_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        544
+      ],
+      "id": "56867d30-ce29-48e6-bb8b-f8d78ab7f7f1",
+      "name": "Get the Product Id",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2145649250,
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=2145649250"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "product_id",
+              "lookupValue": "={{ $json.product_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1024,
+        512
+      ],
+      "id": "291c22d4-644c-4b0e-85cc-d0baa8b4ec55",
+      "name": "Get stock details for the product",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const stocks = $input.all();\nconst quantities = $(\"Get the Product Id\").all();\n\nconst updatedItems = stocks.map((stock, index) => {\n  const quantity = quantities[index]?.json?.quantity || 0;\n  const total = stock?.json?.Stocks + quantity;\n  return { ...stock.json, total };\n});\n\nreturn updatedItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        560
+      ],
+      "id": "d1677f44-dd61-4b56-9d82-fb3f57e308ee",
+      "name": "Calculate the total stocks "
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2145649250,
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=2145649250"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "product_id": "={{ $json.product_id }}",
+            "product_name": "={{ $json.product_name }}",
+            "Stocks": "={{ $json.total }}"
+          },
+          "matchingColumns": [
+            "product_id"
+          ],
+          "schema": [
+            {
+              "id": "product_id",
+              "displayName": "product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Stocks",
+              "displayName": "Stocks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        560
+      ],
+      "id": "a3478c0d-b268-4b20-91f7-cabd6f2a1a8d",
+      "name": "Update the stocks in inventory",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $('Switch').item.json.order_id }}",
+            "first_name": "={{ $('Switch').item.json.first_name }}",
+            "last_name": "={{ $('Switch').item.json.last_name }}",
+            "customer_email": "={{ $('Switch').item.json.customer_email }}",
+            "order_status": "={{ $('Switch').item.json.order_status }}",
+            "order_date": "={{ $('Switch').item.json.order_date }}",
+            "Notification Sent": "Yes"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_status",
+              "displayName": "order_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking URL",
+              "displayName": "Tracking URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking Number",
+              "displayName": "Tracking Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notification Sent",
+              "displayName": "Notification Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1696,
+        560
+      ],
+      "id": "35ac790d-f1a4-430d-b235-ab1e7c5bbf74",
+      "name": "Inventory Updation notified",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        672,
+        560
+      ],
+      "id": "62eb9cbb-1c9f-4a32-bed2-cc3267a89d6f",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ANEQ9F31T",
+          "mode": "list",
+          "cachedResultName": "finance-team"
+        },
+        "text": "=Hey  {{ $('Inventory Updation notified1').item.json.order_id }} has been Refunded and stocks has been updated in the inventory database.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        2128,
+        -224
+      ],
+      "id": "a48ad52d-e9b5-4df2-84c0-1b555f02f05f",
+      "name": "Notify Finance team1",
+      "webhookId": "555af94d-3ca4-4125-a8fd-5e6b9a5270ce",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "MtxAU9MwR0VEzbNT",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "=Your Refund Has Been Processed",
+        "message": "=Hi {{first_name}},\n\nWe wanted to let you know that your refund for order {{order_id}} has been successfully processed.\n\n💳 Refund Details:\n\nProcessing Time: 3–5 business days\n\nIf your order was already delivered, please ensure the item is returned as per our return policy.\n\nThank you for your understanding.\n\n\nRegards,\nCustomer Service Team\n\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        -224
+      ],
+      "id": "f6bb6bb8-6a86-4ab2-b265-1ba9e43d980e",
+      "name": "Notify Customer1",
+      "webhookId": "79442bd5-9a64-47db-a20c-10833656290a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2145649250,
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=2145649250"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "product_id",
+              "lookupValue": "={{ $json.product_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1088,
+        -240
+      ],
+      "id": "5cf5c2fb-71a8-463f-ac8b-14a815ef1df8",
+      "name": "Get stock details for the product1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const stocks = $input.all();\nconst quantities = $(\"Get the Product Id2\").all();\n\nconst updatedItems = stocks.map((stock, index) => {\n  const quantity = quantities[index]?.json?.quantity || 0;\n  const total = stock?.json?.Stocks + quantity;\n  return { ...stock.json, total };\n});\n\nreturn updatedItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        -240
+      ],
+      "id": "33b3203e-4342-4c90-931b-b4f608cc1a5a",
+      "name": "Calculate the total stocks 1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2145649250,
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=2145649250"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "product_id": "={{ $json.product_id }}",
+            "product_name": "={{ $json.product_name }}",
+            "Stocks": "={{ $json.total }}"
+          },
+          "matchingColumns": [
+            "product_id"
+          ],
+          "schema": [
+            {
+              "id": "product_id",
+              "displayName": "product_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Stocks",
+              "displayName": "Stocks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        -224
+      ],
+      "id": "1e2bcedc-b95c-4e24-9ec4-355492674cbb",
+      "name": "Update the stocks in inventory1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $('Switch').item.json.order_id }}",
+            "first_name": "={{ $('Switch').item.json.first_name }}",
+            "last_name": "={{ $('Switch').item.json.last_name }}",
+            "customer_email": "={{ $('Switch').item.json.customer_email }}",
+            "order_status": "={{ $('Switch').item.json.order_status }}",
+            "order_date": "={{ $('Switch').item.json.order_date }}",
+            "Notification Sent": "Yes"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_status",
+              "displayName": "order_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking URL",
+              "displayName": "Tracking URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking Number",
+              "displayName": "Tracking Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notification Sent",
+              "displayName": "Notification Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1712,
+        -224
+      ],
+      "id": "6ac14d2f-e2b9-4ebc-bc95-aad2fd0aff72",
+      "name": "Inventory Updation notified1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        688,
+        -224
+      ],
+      "id": "f6999fa6-06a9-4013-8c1e-a67bfbcd100c",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        336
+      ],
+      "id": "f4321e5e-fd38-4a98-a8e1-dc57394535dc",
+      "name": "Wait",
+      "webhookId": "a66285e6-4bd6-4c86-9af7-592f0b2427be"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "Your Order Has Been Delivered ",
+        "message": "=Hi {{ $json.first_name }},\n\n\nYour order {{ $json.order_id }} has been successfully delivered.\n\nWe hope you enjoy your purchase \n\nIf you have any questions or issues, feel free to reach out to us anytime.\n\nThank you for shopping with us!\n\nBest regards,\nLogistics Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        352
+      ],
+      "id": "aca220bb-afad-41e5-bb06-0a78a4eb7869",
+      "name": "Notify Customer2",
+      "webhookId": "a36f5230-14d1-4f41-8214-ddf684c3571f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Checking the Notification').item.json.customer_email }}",
+        "subject": "How was your experience?",
+        "message": "=Hi {{ $('Checking the Notification').item.json.first_name }},\n\nWe hope you're enjoying your recent purchase!\n\nWe’d love to hear your feedback. Please take a moment to leave a review:\n\nhttps://docs.google.com/forms/d/e/1FAIpQLSfsEVbfhGCAAG0Hnh0ysVApz0YNCueTn3B9-5Q76KKD6SsadA/viewform?usp=header\n\nYour feedback helps us improve and serve you better.\n\nThank you 😊\nTeam",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        336
+      ],
+      "id": "1a2b4154-3791-4c6a-9e94-8b6269d4449a",
+      "name": "Feedback Email",
+      "webhookId": "da7d81e8-5a9b-4566-892c-fd9eec9a7bb3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9voYUMETLZKFUCD0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "order_id",
+              "lookupValue": "={{ $json.order_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1664,
+        -448
+      ],
+      "id": "6595f7d3-2322-49a8-9b4b-300071763d0f",
+      "name": "Get order details",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1362382330,
+          "mode": "list",
+          "cachedResultName": "Order data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=1362382330"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "order_id",
+              "lookupValue": "={{ $('Switch').item.json.order_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        912,
+        -240
+      ],
+      "id": "03346e9a-0d21-43f3-a953-fe824b2f63d9",
+      "name": "Get the Product Id2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e2ce4cd2-fd0a-4e06-80f7-4d0e740a14a5",
+              "leftValue": "={{ $json['Notification Sent'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        -208
+      ],
+      "id": "13bd1d70-453c-47d4-bdbc-de0881eaac18",
+      "name": "Checking notification"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "be221de7-a948-4865-85f4-4f676455ec61",
+              "leftValue": "={{ $json['Notification Sent'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        -32
+      ],
+      "id": "1168badb-8a9c-48b4-83e9-0371e440138a",
+      "name": "Check new order item"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "509b93ec-e25b-41e5-8f40-21e83e9c050d",
+              "leftValue": "={{ $json.order_status }}",
+              "rightValue": "Shipped",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "7892db33-36c2-4e2f-abb5-034cca96eeb6",
+              "leftValue": "={{ $json['Notification Sent'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        496,
+        160
+      ],
+      "id": "ca43831e-21cb-43d3-8a7e-8bacfe767697",
+      "name": "Checking Notified  or not?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9ecee41e-7fec-441a-b041-e58bfc96f07d",
+              "leftValue": "={{ $json['Notification Sent'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        432,
+        368
+      ],
+      "id": "51321199-9d83-47c3-b37b-f09ccf5073db",
+      "name": "Checking the Notification"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e2ce4cd2-fd0a-4e06-80f7-4d0e740a14a5",
+              "leftValue": "={{ $json['Notification Sent'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        576
+      ],
+      "id": "2a8dc8b1-2108-4535-94ac-ca614e4ed5ca",
+      "name": "Checking already notified"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3f3fe086-b413-4641-81a1-aa329a835b19",
+              "leftValue": "={{ $json['Notification Sent'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        752
+      ],
+      "id": "bd18e834-f7ab-49b2-910e-15946d2318c8",
+      "name": "Check the notification"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Remainder Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Checking notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check new order item",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Checking Notified  or not?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Checking the Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Checking already notified",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check the notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remainder Email": {
+      "main": [
+        [
+          {
+            "node": "Notify Payment team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Payment team": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remainder Email1": {
+      "main": [
+        [
+          {
+            "node": "Get Payment details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Payment details": {
+      "main": [
+        [
+          {
+            "node": "Get order details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate time diffrence": {
+      "main": [
+        [
+          {
+            "node": "Time difference > 24",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Time difference > 24": {
+      "main": [
+        [
+          {
+            "node": "Update the status(cancel)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update the status(cancel)": {
+      "main": [
+        [
+          {
+            "node": "Notify the Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify the Customer": {
+      "main": [
+        [
+          {
+            "node": "Notify the Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Remainder Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send Tracking URL to Customer": {
+      "main": [
+        [
+          {
+            "node": "Update the notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify warehouse Team": {
+      "main": [
+        [
+          {
+            "node": "Task for Packing Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Logistics Team": {
+      "main": [
+        [
+          {
+            "node": "Update Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Customer": {
+      "main": [
+        [
+          {
+            "node": "Notify Finance team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the Product Id": {
+      "main": [
+        [
+          {
+            "node": "Get stock details for the product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get stock details for the product": {
+      "main": [
+        [
+          {
+            "node": "Calculate the total stocks ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate the total stocks ": {
+      "main": [
+        [
+          {
+            "node": "Update the stocks in inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update the stocks in inventory": {
+      "main": [
+        [
+          {
+            "node": "Inventory Updation notified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventory Updation notified": {
+      "main": [
+        [
+          {
+            "node": "Notify Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get the Product Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Finance team": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Finance team1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Customer1": {
+      "main": [
+        [
+          {
+            "node": "Notify Finance team1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get stock details for the product1": {
+      "main": [
+        [
+          {
+            "node": "Calculate the total stocks 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate the total stocks 1": {
+      "main": [
+        [
+          {
+            "node": "Update the stocks in inventory1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update the stocks in inventory1": {
+      "main": [
+        [
+          {
+            "node": "Inventory Updation notified1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventory Updation notified1": {
+      "main": [
+        [
+          {
+            "node": "Notify Customer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get the Product Id2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update the notification": {
+      "main": [
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Feedback Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Customer2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get order details": {
+      "main": [
+        [
+          {
+            "node": "Calculate time diffrence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the Product Id2": {
+      "main": [
+        [
+          {
+            "node": "Get stock details for the product1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Checking notification": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check new order item": {
+      "main": [
+        [
+          {
+            "node": "Notify warehouse Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Checking Notified  or not?": {
+      "main": [
+        [
+          {
+            "node": "send Tracking URL to Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Checking the Notification": {
+      "main": [
+        [
+          {
+            "node": "Notify Customer2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Checking already notified": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check the notification": {
+      "main": [
+        [
+          {
+            "node": "Notify Logistics Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "287ef1c3-0f2d-4500-bdb6-2af43b1e5d36",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1a0772e6290ec90909dc4521bfacde6b81688363f2edd371ddc6095fce4174ea"
+  },
+  "id": "1Zs2tkzioMsVVVEj",
+  "tags": []
+}
