@@ -47,7 +47,7 @@ Orders are automatically categorized into seven distinct operational paths:
 ### 3. Safety Checks
 To prevent "notification fatigue," each path includes **"If" nodes** (e.g., *Checking notification*). These verify if an alert has already been sent, ensuring customers and teams never receive duplicate messages for the same status.
 
-``` Mermaid
+``` mermaid
     graph TD
     %% Trigger
     Start([Manual Trigger / Schedule]) --> GetRows[Get Row s from Google Sheets]
@@ -57,15 +57,12 @@ To prevent "notification fatigue," each path includes **"If" nodes** (e.g., *Che
     Switch -- Pending --> Remainder1[Send 1st Gmail Reminder]
     Remainder1 --> SlackPay[Notify Payment Team - Slack]
     SlackPay --> CalcTime[Calculate Time Difference]
+    CalcTime --> Check20{Time > 20 hrs?}
+    Check20 -- Yes --> Rem2[Send 2nd remainder Email]
     CalcTime --> TimeCheck{Is it > 24 Hours?}
     TimeCheck -- Yes --> CancelOrder[Update Sheet: Cancelled]
     CancelOrder --> NotifyCustCancel[Notify Customer - Gmail]
     CancelOrder --> NotifyTeamCancel[Notify Team - Slack]
-
-    %% Path 2: Processing
-    Switch -- Processing --> NewOrderCheck{Check: Notification Sent?}
-    NewOrderCheck -- No --> NotifyWh[Notify Warehouse - Slack]
-    NotifyWh --> AsanaTask[Create Asana Packing Task]
 
     %% Path 3: Shipped
     Switch -- Shipped --> ShipCheck{Check: Notification Sent?}
