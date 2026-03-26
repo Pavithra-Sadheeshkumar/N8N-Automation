@@ -7,7 +7,7 @@
       "typeVersion": 1,
       "position": [
         -352,
-        -160
+        256
       ],
       "id": "39d5241e-1f7f-4ec1-897e-b4e142f37088",
       "name": "When clicking ‘Execute workflow’"
@@ -34,7 +34,7 @@
       "typeVersion": 4.7,
       "position": [
         -128,
-        -160
+        256
       ],
       "id": "ca239afd-ca2e-4e46-86f0-8d74d3d67d4f",
       "name": "Get row(s) in sheet",
@@ -233,7 +233,7 @@
       "typeVersion": 3.4,
       "position": [
         96,
-        -240
+        176
       ],
       "id": "6d135ff9-cc0b-4e24-ae16-41fc8827407b",
       "name": "Switch"
@@ -248,8 +248,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        320,
-        -448
+        560,
+        -656
       ],
       "id": "e3cd2bf5-8d1e-4117-9e2a-879de8f53c60",
       "name": "Remainder Email",
@@ -264,12 +264,12 @@
     {
       "parameters": {
         "authentication": "oAuth2",
-        "select": "user",
-        "user": {
+        "select": "channel",
+        "channelId": {
           "__rl": true,
-          "value": "U0AM1KJP0BC",
+          "value": "C0ANEQ9F31T",
           "mode": "list",
-          "cachedResultName": "pavithrasadheeshkumar"
+          "cachedResultName": "finance-team"
         },
         "text": "=Order ID {{ $('Switch').item.json.order_id }} is in Pending Status for long time.\n\nRemainder Email has been sent to the Customer.\n\nIf Payment is not done in within 24 hrs order will be auto cancelled.",
         "otherOptions": {}
@@ -277,8 +277,8 @@
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.4,
       "position": [
-        544,
-        -448
+        992,
+        -576
       ],
       "id": "2dd0c88f-b9ff-459c-89a3-ff8163a8a4ab",
       "name": "Notify Payment team",
@@ -300,8 +300,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1216,
-        -448
+        1680,
+        -464
       ],
       "id": "1fd7d981-febd-4c00-9359-d5d65e2b3c5f",
       "name": "Remainder Email1",
@@ -346,8 +346,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1440,
-        -448
+        2528,
+        -464
       ],
       "id": "e89dbfba-4b48-4db4-9656-4ca98099029c",
       "name": "Get Payment details",
@@ -372,7 +372,7 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        1888,
+        2944,
         -448
       ],
       "id": "a78f1237-7093-4c47-94aa-3574502b2a11",
@@ -406,7 +406,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        2112,
+        3168,
         -448
       ],
       "id": "08011f43-5f56-4fea-bbd7-e0bd00261504",
@@ -518,8 +518,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        2336,
-        -448
+        3408,
+        -480
       ],
       "id": "47992bb2-4c6d-42e9-9455-50f2be97c8b1",
       "name": "Update the status(cancel)",
@@ -527,58 +527,6 @@
         "googleSheetsOAuth2Api": {
           "id": "e9ggCWLkMojDwqMI",
           "name": "Pavithrasadheesh"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "sendTo": "={{ $json.customer_email }}",
-        "subject": "=Order No : {{ $json.order_id }} Cancelled due to pending payment",
-        "message": "=Dear {{ $json.first_name }},\n\nWe hope you are doing well.\n\nSince we did not receive the payment for your order {{ $json.order_id }} within 24 hours of placing the order, the order has now been automatically cancelled.\n\nIf you still wish to purchase the items, you are welcome to place a new order at any time through our website.\n\nIf you believe this cancellation was made in error or if you have any questions, please feel free to contact our support team and we will be happy to assist you.\n\nThank you for your understanding.\n\nBest regards,\nCustomer Support Team",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.gmail",
-      "typeVersion": 2.2,
-      "position": [
-        2560,
-        -448
-      ],
-      "id": "071c3197-decb-404c-b1e7-28ea88d4c297",
-      "name": "Notify the Customer",
-      "webhookId": "aae1f99f-3ac5-45c0-9425-fcae8031c73b",
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "9voYUMETLZKFUCD0",
-          "name": "Gmail account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "authentication": "oAuth2",
-        "select": "user",
-        "user": {
-          "__rl": true,
-          "value": "U0AM1KJP0BC",
-          "mode": "list",
-          "cachedResultName": "pavithrasadheeshkumar"
-        },
-        "text": "=Order No {{ $('Update the status(cancel)').item.json.order_id }}: Cancelled due to pending payment after 24 hrs and same has been updated in the Sample Order Data Dataabse.\n\nLink:https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?gid=0#gid=0",
-        "otherOptions": {}
-      },
-      "type": "n8n-nodes-base.slack",
-      "typeVersion": 2.4,
-      "position": [
-        2784,
-        -448
-      ],
-      "id": "e1e0533d-220f-4d82-a2ce-69b20745770b",
-      "name": "Notify the Team",
-      "webhookId": "c7c6d046-5628-4e4b-bd29-9bfd80903819",
-      "credentials": {
-        "slackOAuth2Api": {
-          "id": "MtxAU9MwR0VEzbNT",
-          "name": "Slack account"
         }
       }
     },
@@ -609,7 +557,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        992,
+        1424,
         -448
       ],
       "id": "51514ba1-daeb-4f53-9707-9a2c736bd822",
@@ -628,8 +576,8 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        768,
-        -448
+        1200,
+        -432
       ],
       "id": "b05e5916-e2f7-49cc-8c86-77cfa0eec63a",
       "name": "Date & Time"
@@ -644,8 +592,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        704,
-        144
+        752,
+        256
       ],
       "id": "0f1bf985-e5cf-4157-928e-e3261041244b",
       "name": "send Tracking URL to Customer",
@@ -673,8 +621,8 @@
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.4,
       "position": [
-        640,
-        768
+        544,
+        944
       ],
       "id": "c65d57f5-98e4-451a-a8e5-2b0972db23b0",
       "name": "Notify Logistics Team",
@@ -703,7 +651,7 @@
       "typeVersion": 2.4,
       "position": [
         752,
-        -32
+        64
       ],
       "id": "e8189304-bdcd-4bcd-84d8-7df1ea1a6d87",
       "name": "Notify warehouse Team",
@@ -731,8 +679,8 @@
       "type": "n8n-nodes-base.asana",
       "typeVersion": 1,
       "position": [
-        1008,
-        -32
+        976,
+        64
       ],
       "id": "21c5b605-0dc0-4fad-b65a-df87490d3255",
       "name": "Task for Packing Order",
@@ -879,8 +827,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        912,
-        144
+        976,
+        256
       ],
       "id": "871a5dad-af00-416c-9046-e2acc19075ed",
       "name": "Update the notification",
@@ -1025,8 +973,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        896,
-        784
+        768,
+        944
       ],
       "id": "64a9a275-943a-48e9-96b2-3e94e2243de7",
       "name": "Update Notification",
@@ -1053,8 +1001,8 @@
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.4,
       "position": [
-        2112,
-        560
+        2128,
+        656
       ],
       "id": "82208ed4-e095-4176-81cd-a211d797b9cb",
       "name": "Notify Finance team",
@@ -1076,8 +1024,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1904,
-        560
+        1888,
+        640
       ],
       "id": "575c4090-896e-46ba-bba6-77465f4cd304",
       "name": "Notify Customer",
@@ -1118,8 +1066,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        896,
-        544
+        816,
+        640
       ],
       "id": "56867d30-ce29-48e6-bb8b-f8d78ab7f7f1",
       "name": "Get the Product Id",
@@ -1159,8 +1107,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1024,
-        512
+        992,
+        640
       ],
       "id": "291c22d4-644c-4b0e-85cc-d0baa8b4ec55",
       "name": "Get stock details for the product",
@@ -1173,13 +1121,13 @@
     },
     {
       "parameters": {
-        "jsCode": "const stocks = $input.all();\nconst quantities = $(\"Get the Product Id\").all();\n\nconst updatedItems = stocks.map((stock, index) => {\n  const quantity = quantities[index]?.json?.quantity || 0;\n  const total = stock?.json?.Stocks + quantity;\n  return { ...stock.json, total };\n});\n\nreturn updatedItems;\n"
+        "jsCode": "const stocks = $input.all();\nconst orderData = $(\"Get the Product Id\").all(); // For node '1', change this to \"Get the Product Id2\"\n\n// 1. Create a lookup map of product_id -> quantity from the order\nconst quantityMap = {};\norderData.forEach(item => {\n  const pid = item.json.product_id;\n  const qty = parseFloat(item.json.quantity) || 0;\n  quantityMap[pid] = qty;\n});\n\n// 2. Map through stocks and add the specific quantity for THAT product\nreturn stocks.map(stock => {\n  const productId = stock.json.product_id;\n  const currentStock = parseFloat(stock.json.Stocks) || 0;\n  const orderQty = quantityMap[productId] || 0;\n  \n  return {\n    json: {\n      ...stock.json,\n      total: currentStock + orderQty\n    }\n  };\n});\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1248,
-        560
+        1216,
+        640
       ],
       "id": "d1677f44-dd61-4b56-9d82-fb3f57e308ee",
       "name": "Calculate the total stocks "
@@ -1260,8 +1208,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1488,
-        560
+        1440,
+        640
       ],
       "id": "a3478c0d-b268-4b20-91f7-cabd6f2a1a8d",
       "name": "Update the stocks in inventory",
@@ -1406,8 +1354,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1696,
-        560
+        1664,
+        640
       ],
       "id": "35ac790d-f1a4-430d-b235-ab1e7c5bbf74",
       "name": "Inventory Updation notified",
@@ -1425,8 +1373,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        672,
-        560
+        608,
+        640
       ],
       "id": "62eb9cbb-1c9f-4a32-bed2-cc3267a89d6f",
       "name": "Loop Over Items"
@@ -1447,8 +1395,8 @@
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.4,
       "position": [
-        2128,
-        -224
+        2112,
+        -192
       ],
       "id": "a48ad52d-e9b5-4df2-84c0-1b555f02f05f",
       "name": "Notify Finance team1",
@@ -1470,8 +1418,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1920,
-        -224
+        1888,
+        -256
       ],
       "id": "f6bb6bb8-6a86-4ab2-b265-1ba9e43d980e",
       "name": "Notify Customer1",
@@ -1512,8 +1460,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1088,
-        -240
+        992,
+        -256
       ],
       "id": "5cf5c2fb-71a8-463f-ac8b-14a815ef1df8",
       "name": "Get stock details for the product1",
@@ -1526,13 +1474,13 @@
     },
     {
       "parameters": {
-        "jsCode": "const stocks = $input.all();\nconst quantities = $(\"Get the Product Id2\").all();\n\nconst updatedItems = stocks.map((stock, index) => {\n  const quantity = quantities[index]?.json?.quantity || 0;\n  const total = stock?.json?.Stocks + quantity;\n  return { ...stock.json, total };\n});\n\nreturn updatedItems;\n"
+        "jsCode": "const stocks = $input.all();\nconst orderData = $(\"Get the Product Id\").all(); // For node '1', change this to \"Get the Product Id2\"\n\n// 1. Create a lookup map of product_id -> quantity from the order\nconst quantityMap = {};\norderData.forEach(item => {\n  const pid = item.json.product_id;\n  const qty = parseFloat(item.json.quantity) || 0;\n  quantityMap[pid] = qty;\n});\n\n// 2. Map through stocks and add the specific quantity for THAT product\nreturn stocks.map(stock => {\n  const productId = stock.json.product_id;\n  const currentStock = parseFloat(stock.json.Stocks) || 0;\n  const orderQty = quantityMap[productId] || 0;\n  \n  return {\n    json: {\n      ...stock.json,\n      total: currentStock + orderQty\n    }\n  };\n});\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1296,
-        -240
+        1216,
+        -256
       ],
       "id": "33b3203e-4342-4c90-931b-b4f608cc1a5a",
       "name": "Calculate the total stocks 1"
@@ -1613,8 +1561,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1504,
-        -224
+        1440,
+        -256
       ],
       "id": "1e2bcedc-b95c-4e24-9ec4-355492674cbb",
       "name": "Update the stocks in inventory1",
@@ -1759,8 +1707,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1712,
-        -224
+        1664,
+        -256
       ],
       "id": "6ac14d2f-e2b9-4ebc-bc95-aad2fd0aff72",
       "name": "Inventory Updation notified1",
@@ -1778,22 +1726,21 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        688,
-        -224
+        544,
+        -192
       ],
       "id": "f6999fa6-06a9-4013-8c1e-a67bfbcd100c",
       "name": "Loop Over Items1"
     },
     {
       "parameters": {
-        "amount": 1,
-        "unit": "days"
+        "amount": 1
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        960,
-        336
+        768,
+        448
       ],
       "id": "f4321e5e-fd38-4a98-a8e1-dc57394535dc",
       "name": "Wait",
@@ -1809,8 +1756,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        720,
-        352
+        544,
+        448
       ],
       "id": "aca220bb-afad-41e5-bb06-0a78a4eb7869",
       "name": "Notify Customer2",
@@ -1832,8 +1779,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1200,
-        336
+        992,
+        448
       ],
       "id": "1a2b4154-3791-4c6a-9e94-8b6269d4449a",
       "name": "Feedback Email",
@@ -1874,7 +1821,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1664,
+        2720,
         -448
       ],
       "id": "6595f7d3-2322-49a8-9b4b-300071763d0f",
@@ -1915,8 +1862,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        912,
-        -240
+        768,
+        -256
       ],
       "id": "03346e9a-0d21-43f3-a953-fe824b2f63d9",
       "name": "Get the Product Id2",
@@ -1954,8 +1901,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        400,
-        -208
+        320,
+        -192
       ],
       "id": "13bd1d70-453c-47d4-bdbc-de0881eaac18",
       "name": "Checking notification"
@@ -1988,8 +1935,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        512,
-        -32
+        528,
+        64
       ],
       "id": "1168badb-8a9c-48b4-83e9-0371e440138a",
       "name": "Check new order item"
@@ -2031,8 +1978,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        496,
-        160
+        528,
+        256
       ],
       "id": "ca43831e-21cb-43d3-8a7e-8bacfe767697",
       "name": "Checking Notified  or not?"
@@ -2064,8 +2011,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        432,
-        368
+        320,
+        448
       ],
       "id": "51321199-9d83-47c3-b37b-f09ccf5073db",
       "name": "Checking the Notification"
@@ -2097,8 +2044,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        384,
-        576
+        304,
+        704
       ],
       "id": "2a8dc8b1-2108-4535-94ac-ca614e4ed5ca",
       "name": "Checking already notified"
@@ -2131,11 +2078,513 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        368,
-        752
+        320,
+        944
       ],
       "id": "bd18e834-f7ab-49b2-910e-15946d2318c8",
       "name": "Check the notification"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2096,
+        -464
+      ],
+      "id": "e2fe9c17-d2c0-42cc-ba3a-d79b1ec7735f",
+      "name": "Wait1",
+      "webhookId": "5e20d2e9-6410-404c-8a30-6a6455736127"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2304,
+        -464
+      ],
+      "id": "85c706bd-0453-413b-942e-82db503b2f0a",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "first_name": "={{ $('Switch').item.json.first_name }}",
+            "order_id": "={{ $('Switch').item.json.order_id }}",
+            "last_name": "={{ $('Switch').item.json.last_name }}",
+            "customer_email": "={{ $('Switch').item.json.customer_email }}",
+            "order_date": "={{ $('Switch').item.json.order_date }}",
+            "order_status": "={{ $('Switch').item.json.order_status }}",
+            "Notification Sent": "Sent2"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_status",
+              "displayName": "order_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking Number",
+              "displayName": "Tracking Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notification Sent",
+              "displayName": "Notification Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1888,
+        -464
+      ],
+      "id": "8d75b96f-41d8-461c-8ef8-7fb9936b9576",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $('Switch').item.json.order_id }}",
+            "first_name": "={{ $('Switch').item.json.first_name }}",
+            "last_name": "={{ $('Switch').item.json.last_name }}",
+            "customer_email": "={{ $('Switch').item.json.customer_email }}",
+            "order_date": "={{ $('Switch').item.json.order_date }}",
+            "order_status": "={{ $('Switch').item.json.order_status }}",
+            "Notification Sent": "Sent1"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_status",
+              "displayName": "order_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking Number",
+              "displayName": "Tracking Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notification Sent",
+              "displayName": "Notification Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        816,
+        -672
+      ],
+      "id": "18d0ea76-2eff-4bdb-858a-5caa00e27e24",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Notification Sent'] }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6c70a63d-21bf-4edd-92b0-2409201a7237"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "=send remainder email1 "
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "df2b9a1b-9cf6-4f43-ad74-cdb666e335f9",
+                    "leftValue": "={{ $json['Notification Sent'] }}",
+                    "rightValue": "Sent1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "send remainder email2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        -576
+      ],
+      "id": "9f2c82c3-7f82-411b-9c9c-d79b3a8668da",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H-65iZ9eNJjednro6EgqvNRLu2Vm-BiVP8P_Ewq2cak/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id": "={{ $json.order_id }}",
+            "first_name": "={{ $json.first_name }}",
+            "last_name": "={{ $json.last_name }}",
+            "customer_email": "={{ $json.customer_email }}",
+            "order_status": "={{ $json.order_status }}",
+            "order_date": "={{ $json.order_date }}",
+            "Notification Sent": "No"
+          },
+          "matchingColumns": [
+            "order_id"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_name",
+              "displayName": "last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_status",
+              "displayName": "order_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "order_date",
+              "displayName": "order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking Number",
+              "displayName": "Tracking Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notification Sent",
+              "displayName": "Notification Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3680,
+        -464
+      ],
+      "id": "c50ad079-db5c-4c6e-bd08-79152d87ff38",
+      "name": "Update row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e9ggCWLkMojDwqMI",
+          "name": "Pavithrasadheesh"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -2166,7 +2615,7 @@
       "main": [
         [
           {
-            "node": "Remainder Email",
+            "node": "Switch1",
             "type": "main",
             "index": 0
           }
@@ -2219,7 +2668,7 @@
       "main": [
         [
           {
-            "node": "Notify Payment team",
+            "node": "Update row in sheet1",
             "type": "main",
             "index": 0
           }
@@ -2228,20 +2677,14 @@
     },
     "Notify Payment team": {
       "main": [
-        [
-          {
-            "node": "Date & Time",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Remainder Email1": {
       "main": [
         [
           {
-            "node": "Get Payment details",
+            "node": "Update row in sheet",
             "type": "main",
             "index": 0
           }
@@ -2285,18 +2728,7 @@
       "main": [
         [
           {
-            "node": "Notify the Customer",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Notify the Customer": {
-      "main": [
-        [
-          {
-            "node": "Notify the Team",
+            "node": "Update row in sheet2",
             "type": "main",
             "index": 0
           }
@@ -2639,6 +3071,85 @@
           }
         ]
       ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get Payment details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Notify Payment team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Remainder Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Checking already notified",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -2646,7 +3157,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "287ef1c3-0f2d-4500-bdb6-2af43b1e5d36",
+  "versionId": "9746e691-d777-4fe4-8ebb-400474c4ced3",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "1a0772e6290ec90909dc4521bfacde6b81688363f2edd371ddc6095fce4174ea"
