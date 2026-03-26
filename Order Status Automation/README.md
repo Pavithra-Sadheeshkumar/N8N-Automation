@@ -96,6 +96,9 @@ To prevent "notification fatigue," each path includes **"If" nodes** (e.g., *Che
 
 ---
 
+<img width="1680" height="792" alt="image" src="https://github.com/user-attachments/assets/e2ea2d13-0432-47e8-ac7e-d14c35d4f808" />
+
+
 ## 🔧 Setup Instructions
 
 ### 1. Import Workflow
