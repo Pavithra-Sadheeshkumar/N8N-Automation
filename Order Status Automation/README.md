@@ -196,3 +196,66 @@ You will need to connect the following accounts within n8n:
 * **Sheet IDs:** Ensure the `documentId` in all Google Sheets nodes is updated to match your specific Spreadsheet ID.
 * **Channel IDs:** Update the Slack channel IDs to match your specific workspace channels for Finance, Warehouse, and Logistics.
 
+
+
+
+```mermaid
+graph TD
+    %% Start and Data Fetch
+    Start([Manual Trigger]) --> GetRows[Google Sheets: Get Order Rows]
+    GetRows --> MainSwitch{Switch: order_status}
+
+    %% PENDING PATH (The State Machine)
+    MainSwitch -- Pending --> PendingSwitch{Switch: Notification Sent}
+    
+    PendingSwitch -- "Empty/Blank" --> Email1[Gmail: Send 1st Reminder]
+    Email1 --> UpdateSent1[Google Sheets: Set 'Sent1']
+    UpdateSent1 --> SlackFinance[Slack: Notify Finance Team]
+
+    PendingSwitch -- "Sent1" --> TimeCheck20{Time > 20h?}
+    TimeCheck20 -- Yes --> Email2[Gmail: Send 2nd Reminder]
+    Email2 --> UpdateSent2[Google Sheets: Set 'Sent2']
+    
+    PendingSwitch -- "Sent2" --> TimeCheck24{Time > 24h?}
+    TimeCheck24 -- Yes --> CancelOrder[Google Sheets: Set Status 'Cancelled']
+    CancelOrder --> UpdateSentNo[Google Sheets: Set 'No']
+    UpdateSentNo --> LoopCancel[Loop: Inventory Restock Path]
+
+    %% PROCESSING PATH
+    MainSwitch -- Processing --> CheckProc{If: Notification != 'Yes'}
+    CheckProc -- Yes --> SlackWh[Slack: Notify Warehouse]
+    SlackWh --> Asana[Asana: Create Packing Task]
+    Asana --> UpdateProcYes[Google Sheets: Set 'Yes']
+
+    %% SHIPPED PATH
+    MainSwitch -- Shipped --> CheckShip{If: Notification != 'Yes'}
+    CheckShip -- Yes --> GmailShip[Gmail: Send Tracking URL]
+    GmailShip --> UpdateShipYes[Google Sheets: Set 'Yes']
+
+    %% DELIVERED PATH
+    MainSwitch -- Delivered --> CheckDeliv{If: Notification != 'Yes'}
+    CheckDeliv -- Yes --> GmailDeliv[Gmail: Confirm Delivery]
+    GmailDeliv --> Wait24[Wait 24 Hours]
+    Wait24 --> Feedback[Gmail: Send Feedback Survey]
+
+    %% REFUNDED / CANCELLED (Inventory Logic)
+    MainSwitch -- Refunded/Cancelled --> CheckInv{If: Notification != 'Yes'}
+    CheckInv -- Yes --> GetProd[Google Sheets: Get Product IDs]
+    GetProd --> GetStock[Google Sheets: Get Current Stock]
+    GetStock --> CalcStock[Code Node: Match IDs & Calc Total]
+    CalcStock --> UpdateInv[Google Sheets: Update Inventory]
+    UpdateInv --> UpdateInvYes[Google Sheets: Set 'Yes']
+    UpdateInvYes --> SlackFinInv[Slack: Notify Finance - Stock Updated]
+
+    %% READY FOR PICKUP
+    MainSwitch -- "Ready for Pickup" --> CheckPick{If: Notification != 'Yes'}
+    CheckPick -- Yes --> SlackLog[Slack: Notify Logistics]
+    SlackLog --> UpdatePickYes[Google Sheets: Set 'Yes']
+
+    %% Styling
+    style Start fill:#f9f,stroke:#333,stroke-width:2px
+    style MainSwitch fill:#fff4dd,stroke:#d4a017,stroke-width:2px
+    style PendingSwitch fill:#fff4dd,stroke:#d4a017,stroke-width:2px
+    style CalcStock fill:#e1f5fe,stroke:#01579b
+    style Wait24 fill:#f5f5f5,stroke:#666,stroke-dasharray: 5 5
+
