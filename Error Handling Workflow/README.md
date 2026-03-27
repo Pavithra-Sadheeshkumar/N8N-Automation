@@ -66,3 +66,23 @@ To use this workflow, go to the **Settings** of any other workflow and set this 
 The workflow includes pinned data for an "AI Sales Email Follow up" failure (NodeApiError 400). You can use this pinned data to test the Slack and Gmail
 formatting without needing to trigger a real error.
 
+## 📸 Visualizing the Output
+
+### 1. Workflow Execution
+
+<img width="1557" height="790" alt="image" src="https://github.com/user-attachments/assets/6a5612f7-68d8-47df-965d-23a1e110d4d6" />
+
+### 2. Error workflow
+
+<img width="940" height="445" alt="image" src="https://github.com/user-attachments/assets/020f7ccd-aab0-43da-aa1c-6997a1de84c2" />
+
+### 3. Gmail Message
+
+<img width="1107" height="502" alt="image" src="https://github.com/user-attachments/assets/f43b74f4-a5f7-4bc2-bb7a-1526f0f323a6" />
+
+### 4.Slack Notification
+
+<img width="1157" height="637" alt="image" src="https://github.com/user-attachments/assets/7c8b6788-597a-4fc3-8e30-de9bf3eab309" />
+
+
+
