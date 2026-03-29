@@ -3,7 +3,14 @@
 This workflow serves as a centralized error-handling system for your n8n environment. It automatically triggers whenever another workflow fails, evaluates the severity of the error, notifies the relevant team members via Slack or Gmail, and logs the incident in Google Sheets for auditing.
 
 ---
-
+## 🌟 Features 
+* **Automated Error Detection**: Instantly captures failures across all workflows using a global Error Trigger.
+* **Dynamic Priority Routing**: Automatically sorts errors into "High" or "Low" priority based on HTTP codes and error messages.
+* **Smart Lookups**: Retrieves workflow owner details and Slack IDs from a centralized Google Sheet for personalized alerts.
+* **Interactive Slack Alerts**: Sends rich notifications with "Debug Here" buttons that link directly to the failed execution.
+* **Automated Audit Logging**: Maintains a historical record of all errors, including node names and error messages, in Google Sheets.
+* **Fail-Safe Notifications**: Notifies the broader team via Gmail if an error doesn't meet high-priority Slack criteria.
+---
 ## 🚀 Workflow Logic Overview
 
 1.  **Error Detection**: The workflow starts with an **Error Trigger**, which captures details from any failing workflow in n8n instance.
@@ -41,13 +48,7 @@ graph TD
 * **Gmail**: Email notifications for Low-Priority team alerts.
 
 ---
-## 🌟 Features 
-* **Automated Error Detection**: Instantly captures failures across all workflows using a global Error Trigger.
-* **Dynamic Priority Routing**: Automatically sorts errors into "High" or "Low" priority based on HTTP codes and error messages.
-* **Smart Lookups**: Retrieves workflow owner details and Slack IDs from a centralized Google Sheet for personalized alerts.
-* **Interactive Slack Alerts**: Sends rich notifications with "Debug Here" buttons that link directly to the failed execution.
-* **Automated Audit Logging**: Maintains a historical record of all errors, including node names and error messages, in Google Sheets.
-* **Fail-Safe Notifications**: Notifies the broader team via Gmail if an error doesn't meet high-priority Slack criteria.
+
 ## 📋 Setup
 
 ### 1. Google Sheets Configuration
