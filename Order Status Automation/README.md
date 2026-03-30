@@ -47,57 +47,72 @@ Orders are automatically categorized into seven distinct operational paths:
 ### 3. Safety Checks
 To prevent "notification fatigue," each path includes **"If" nodes** (e.g., *Checking notification*). These verify if an alert has already been sent, ensuring customers and teams never receive duplicate messages for the same status.
 
-``` mermaid
-    graph TD
-    %% Trigger
-    Start([Manual Trigger / Schedule]) --> GetRows[Get Row s from Google Sheets]
-    GetRows --> Switch{Switch: Order Status}
 
-    %% Path 1: Pending
-    Switch -- Pending --> Remainder1[Send 1st Gmail Reminder]
-    Remainder1 --> SlackPay[Notify Payment Team - Slack]
-    SlackPay --> CalcTime[Calculate Time Difference]
-    CalcTime --> Check20{Time > 20 hrs?}
-    Check20 -- Yes --> Rem2[Send 2nd remainder Email]
-    CalcTime --> TimeCheck{Is it > 24 Hours?}
-    TimeCheck -- Yes --> CancelOrder[Update Sheet: Cancelled]
-    CancelOrder --> NotifyCustCancel[Notify Customer - Gmail]
-    CancelOrder --> NotifyTeamCancel[Notify Team - Slack]
+```mermaid
+graph TD
+    %% Start and Data Fetch
+    Start([Manual Trigger]) --> GetRows[Google Sheets: Get Order Rows]
+    GetRows --> MainSwitch{Switch: order_status}
 
-    %% Path 3: Shipped
-    Switch -- Shipped --> ShipCheck{Check: Notification Sent?}
-    ShipCheck -- No --> GmailTrack[Send Tracking URL - Gmail]
-    GmailTrack --> UpdateNotif1[Update Sheet: Notification Sent]
+    %% PENDING PATH (The State Machine)
+    MainSwitch -- Pending --> PendingSwitch{Switch: Notification Sent}
+    
+    PendingSwitch -- "Empty/Blank" --> Email1[Gmail: Send 1st Reminder]
+    Email1 --> UpdateSent1[Google Sheets: Set 'Sent1']
+    UpdateSent1 --> SlackFinance[Slack: Notify Finance Team]
 
-    %% Path 4: Delivered
-    Switch -- Delivered --> DelivCheck{Check: Notification Sent?}
-    DelivCheck -- No --> GmailDeliv[Send Delivery Email]
+    PendingSwitch -- "Sent1" --> TimeCheck20{Time > 20h?}
+    TimeCheck20 -- Yes --> Email2[Gmail: Send 2nd Reminder]
+    Email2 --> UpdateSent2[Google Sheets: Set 'Sent2']
+    
+    PendingSwitch -- "Sent2" --> TimeCheck24{Time > 24h?}
+    TimeCheck24 -- Yes --> CancelOrder[Google Sheets: Set Status 'Cancelled']
+    CancelOrder --> UpdateSentNo[Google Sheets: Set 'No']
+    UpdateSentNo --> LoopCancel[Loop: Inventory Restock Path]
+
+    %% PROCESSING PATH
+    MainSwitch -- Processing --> CheckProc{If: Notification != 'Yes'}
+    CheckProc -- Yes --> SlackWh[Slack: Notify Warehouse]
+    SlackWh --> Asana[Asana: Create Packing Task]
+    Asana --> UpdateProcYes[Google Sheets: Set 'Yes']
+
+    %% SHIPPED PATH
+    MainSwitch -- Shipped --> CheckShip{If: Notification != 'Yes'}
+    CheckShip -- Yes --> GmailShip[Gmail: Send Tracking URL]
+    GmailShip --> UpdateShipYes[Google Sheets: Set 'Yes']
+
+    %% DELIVERED PATH
+    MainSwitch -- Delivered --> CheckDeliv{If: Notification != 'Yes'}
+    CheckDeliv -- Yes --> GmailDeliv[Gmail: Confirm Delivery]
     GmailDeliv --> Wait24[Wait 24 Hours]
-    Wait24 --> Feedback[Send Feedback Form - Gmail]
+    Wait24 --> Feedback[Gmail: Send Feedback Survey]
 
-    %% Path 5: Refunded / Cancelled (Inventory)
-    Switch -- Refunded/Cancelled --> AlreadyNotified{Already Notified?}
-    AlreadyNotified -- No --> GetProd[Get Product ID & Quantity]
-    GetProd --> GetStock[Get Current Inventory Stock]
-    GetStock --> CalcStock[Code Node: Calculate New Total]
-    CalcStock --> UpdateInv[Update Google Sheets Inventory]
-    UpdateInv --> NotifyFin[Notify Finance Team - Slack]
+    %% REFUNDED / CANCELLED (Inventory Logic)
+    MainSwitch -- Refunded/Cancelled --> CheckInv{If: Notification != 'Yes'}
+    CheckInv -- Yes --> GetProd[Google Sheets: Get Product IDs]
+    GetProd --> GetStock[Google Sheets: Get Current Stock]
+    GetStock --> CalcStock[Code Node: Match IDs & Calc Total]
+    CalcStock --> UpdateInv[Google Sheets: Update Inventory]
+    UpdateInv --> UpdateInvYes[Google Sheets: Set 'Yes']
+    UpdateInvYes --> SlackFinInv[Slack: Notify Finance - Stock Updated]
 
-    %% Path 6: Ready for Pickup
-    Switch -- Ready for Pickup --> PickupCheck{Check: Notification Sent?}
-    PickupCheck -- No --> NotifyLog[Notify Logistics Team - Slack]
-    NotifyLog --> UpdateNotif2[Update Sheet: Notification Sent]
+    %% READY FOR PICKUP
+    MainSwitch -- "Ready for Pickup" --> CheckPick{If: Notification != 'Yes'}
+    CheckPick -- Yes --> SlackLog[Slack: Notify Logistics]
+    SlackLog --> UpdatePickYes[Google Sheets: Set 'Yes']
 
     %% Styling
     style Start fill:#f9f,stroke:#333,stroke-width:2px
-    style Switch fill:#fff4dd,stroke:#d4a017,stroke-width:2px
+    style MainSwitch fill:#fff4dd,stroke:#d4a017,stroke-width:2px
+    style PendingSwitch fill:#fff4dd,stroke:#d4a017,stroke-width:2px
     style CalcStock fill:#e1f5fe,stroke:#01579b
-```
+    style Wait24 fill:#f5f5f5,stroke:#666,stroke-dasharray: 5 5
 
+```
 ---
 
 ## 📸 Visualizing the Output
----
+
 ### 1. Workflow Execution
 
 <img width="1888" height="1007" alt="image" src="https://github.com/user-attachments/assets/66431062-0054-4bf3-9957-2584b7a53524" />
@@ -198,64 +213,4 @@ You will need to connect the following accounts within n8n:
 
 
 
-
-```mermaid
-graph TD
-    %% Start and Data Fetch
-    Start([Manual Trigger]) --> GetRows[Google Sheets: Get Order Rows]
-    GetRows --> MainSwitch{Switch: order_status}
-
-    %% PENDING PATH (The State Machine)
-    MainSwitch -- Pending --> PendingSwitch{Switch: Notification Sent}
-    
-    PendingSwitch -- "Empty/Blank" --> Email1[Gmail: Send 1st Reminder]
-    Email1 --> UpdateSent1[Google Sheets: Set 'Sent1']
-    UpdateSent1 --> SlackFinance[Slack: Notify Finance Team]
-
-    PendingSwitch -- "Sent1" --> TimeCheck20{Time > 20h?}
-    TimeCheck20 -- Yes --> Email2[Gmail: Send 2nd Reminder]
-    Email2 --> UpdateSent2[Google Sheets: Set 'Sent2']
-    
-    PendingSwitch -- "Sent2" --> TimeCheck24{Time > 24h?}
-    TimeCheck24 -- Yes --> CancelOrder[Google Sheets: Set Status 'Cancelled']
-    CancelOrder --> UpdateSentNo[Google Sheets: Set 'No']
-    UpdateSentNo --> LoopCancel[Loop: Inventory Restock Path]
-
-    %% PROCESSING PATH
-    MainSwitch -- Processing --> CheckProc{If: Notification != 'Yes'}
-    CheckProc -- Yes --> SlackWh[Slack: Notify Warehouse]
-    SlackWh --> Asana[Asana: Create Packing Task]
-    Asana --> UpdateProcYes[Google Sheets: Set 'Yes']
-
-    %% SHIPPED PATH
-    MainSwitch -- Shipped --> CheckShip{If: Notification != 'Yes'}
-    CheckShip -- Yes --> GmailShip[Gmail: Send Tracking URL]
-    GmailShip --> UpdateShipYes[Google Sheets: Set 'Yes']
-
-    %% DELIVERED PATH
-    MainSwitch -- Delivered --> CheckDeliv{If: Notification != 'Yes'}
-    CheckDeliv -- Yes --> GmailDeliv[Gmail: Confirm Delivery]
-    GmailDeliv --> Wait24[Wait 24 Hours]
-    Wait24 --> Feedback[Gmail: Send Feedback Survey]
-
-    %% REFUNDED / CANCELLED (Inventory Logic)
-    MainSwitch -- Refunded/Cancelled --> CheckInv{If: Notification != 'Yes'}
-    CheckInv -- Yes --> GetProd[Google Sheets: Get Product IDs]
-    GetProd --> GetStock[Google Sheets: Get Current Stock]
-    GetStock --> CalcStock[Code Node: Match IDs & Calc Total]
-    CalcStock --> UpdateInv[Google Sheets: Update Inventory]
-    UpdateInv --> UpdateInvYes[Google Sheets: Set 'Yes']
-    UpdateInvYes --> SlackFinInv[Slack: Notify Finance - Stock Updated]
-
-    %% READY FOR PICKUP
-    MainSwitch -- "Ready for Pickup" --> CheckPick{If: Notification != 'Yes'}
-    CheckPick -- Yes --> SlackLog[Slack: Notify Logistics]
-    SlackLog --> UpdatePickYes[Google Sheets: Set 'Yes']
-
-    %% Styling
-    style Start fill:#f9f,stroke:#333,stroke-width:2px
-    style MainSwitch fill:#fff4dd,stroke:#d4a017,stroke-width:2px
-    style PendingSwitch fill:#fff4dd,stroke:#d4a017,stroke-width:2px
-    style CalcStock fill:#e1f5fe,stroke:#01579b
-    style Wait24 fill:#f5f5f5,stroke:#666,stroke-dasharray: 5 5
 
