@@ -24,15 +24,6 @@ This workflow acts as an automated **Sales Development Representative (SDR)**. I
 
 ---
 
-## 🛠️ Tech Stack
-
-* **Automation**: [n8n.io](https://n8n.io/)
-* **Intelligence**: Hunter.io (Email Verifier & Information Discovery)
-* **CRM/Database**: Airtable, Google Sheets
-* **Communication**: Slack, Gmail
-* **Productivity**: Google Docs, Google Drive, Google Calendar
-
----
 
 ## 📋 Workflow Logic
 
@@ -49,45 +40,95 @@ This workflow acts as an automated **Sales Development Representative (SDR)**. I
   
 ```mermaid
 graph TD
-    %% Trigger
-    A[Form Submission] -->|Webhook| B(n8n Workflow Engine)
+    %% Start Node
+    Start((On Form Submission)) --> EmailVal{Basic Email<br/>Validation}
 
-    %% Validation & Enrichment
-    B --> C{Email Validation}
-    C -->|Valid| D[Hunter.io API]
-    C -->|Invalid| E[(Log: Discarded)]
+    %% Basic Validation Branch
+    EmailVal -- Failed --> LogDiscard1[Log Discarded:<br/>Basic Validation]
+    EmailVal -- Passed --> HunterVerify[Verify Email<br/>with Hunter]
+
+    %% 3rd Party Validation Branch
+    HunterVerify --> HunterVal{3rd Party Email<br/>Validation}
+    HunterVal -- Failed --> LogDiscard2[Log Discarded:<br/>3rd Party Validation]
+    HunterVal -- Passed --> Enrich[Enrich Lead Information &<br/>Combine Data]
+
+    %% CRM Integration
+    Enrich --> AirtableSearch[Search Airtable Records]
+    AirtableSearch --> EnrichCRM[Enrich Data with CRM]
+
+    %% Customer Tagging (Switch)
+    EnrichCRM --> SwitchTag{Customer Type?}
+    SwitchTag -- No ID --> TagNew[Tag: New Customer]
+    SwitchTag -- Revenue < 100k --> TagGen[Tag: General Customer]
+    SwitchTag -- Revenue >= 100k --> TagVIP[Tag: VIP Customer]
+
+    %% Scoring Logic
+    TagNew & TagGen & TagVIP --> InitScore[Initialize Lead Score]
+    InitScore --> CheckScore1{Hunter Score > 60?}
     
-    D -->|Enrich Data| F[Airtable CRM Lookup]
+    CheckScore1 -- Yes --> Inc1[Increment Score +1]
+    CheckScore1 -- No --> CheckCountry
+    Inc1 --> CheckCountry{Country Code<br/>Match?}
+
+    CheckCountry -- Yes --> Inc2[Increment Score +1]
+    CheckCountry -- No --> CheckInd
+    Inc2 --> CheckInd{Industry:<br/>Software?}
+
+    CheckInd -- Yes --> Inc3[Increment Score +1]
+    CheckInd -- No --> CalcFinal[Lead Score Calculation]
+    Inc3 --> CalcFinal
+
+    %% Action Switch based on Lead Type
+    CalcFinal --> SwitchValue{Lead Value?}
+
+    %% Low Value Path
+    SwitchValue -- Low Value --> Nurture[Add to Nurture List]
+    Nurture --> LogNurture[Make Entry in All Log]
+
+    %% Medium Value Path
+    SwitchValue -- Medium Value --> Approval[Request Approval<br/>via Gmail]
+    Approval --> ApprCheck{Approved?}
+    ApprCheck -- No --> LogDisappr[Log: Disapproved]
+    ApprCheck -- Yes --> AlertAE
+
+    %% High Value Path
+    SwitchValue -- High Value --> AlertAE[Alert Account Executive<br/>via Slack]
     
-    %% Scoring
-    F --> G{Lead Scoring Logic}
-    G -->|High Value| H[High-Value Path]
-    G -->|Medium Value| I[Medium-Value Path]
-    G -->|Low Value| J[Low-Value Path]
+    %% Document Generation (Parallel for High/Medium)
+    SwitchValue -- High/Medium --> CopyDoc[Copy Google Doc Template]
+    CopyDoc --> UpdateDoc[Update Dynamic Data]
+    UpdateDoc --> DownloadPDF[Download as PDF]
+    DownloadPDF --> UploadPDF[Upload PDF to Drive]
+    UploadPDF --> DeleteTemp[Delete Temp Doc]
+    DeleteTemp --> NotifyCoord[Notify Content Coordinator<br/>via Slack]
 
-    %% Actions: High Value
-    H --> H1[Slack Alert]
-    H --> H2[Google Calendar Invite]
-    H --> H3[Gmail: Welcome Series]
+    %% Meeting Path
+    AlertAE --> CalMeeting[Set up Google Calendar Meeting]
+    CalMeeting --> WelcomeEmail[Send Welcome Email]
+    WelcomeEmail --> Wait[Wait 4 Days]
+    Wait --> FollowUp[Send Follow-up Email]
+    FollowUp --> LogApproved[Log: Approved & Processed]
 
-    %% Actions: Medium Value
-    I --> I1[Gmail: Manager Approval]
-    I1 -->|Approved| H
-    I1 -->|Denied| E
-
-    %% Actions: Low Value
-    J --> J1[(Google Sheets: Nurture List)]
-
-    %% Document Generation (Parallel for High/Med)
-    H & I1 --> K[Google Docs Template]
-    K --> L[Convert to PDF]
-    L --> M[Google Drive Upload]
-
-    %% Final Logging
-    H1 & J1 & M --> N[(Master Log: Google Sheets)]
+    %% Styling
+    style EmailVal fill:#f9f,stroke:#333
+    style HunterVal fill:#f9f,stroke:#333
+    style SwitchValue fill:#f9f,stroke:#333
+    style Start fill:#dfd,stroke:#333
+    style LogDiscard1 fill:#fdd,stroke:#333
+    style LogDiscard2 fill:#fdd,stroke:#333
 
 ```
 
+---
+
+## 🛠️ Tech Stack
+
+* **Automation**: [n8n.io](https://n8n.io/)
+* **Intelligence**: Hunter.io (Email Verifier & Information Discovery)
+* **CRM/Database**: Airtable, Google Sheets
+* **Communication**: Slack, Gmail
+* **Productivity**: Google Docs, Google Drive, Google Calendar
+---
     
 ## ⚙️ Setup
 
@@ -99,6 +140,8 @@ graph TD
     * Airtable
 
 3.	**Environment Variables**: Ensure the Folder IDs and Spreadsheet IDs in the node parameters match your local setup.
+
+---
 
 ## 📸 Visualizing the Output
 
