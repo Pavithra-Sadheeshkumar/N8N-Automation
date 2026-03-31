@@ -193,6 +193,11 @@ graph TD
 
 <img width="720" height="627" alt="image" src="https://github.com/user-attachments/assets/f02eb02e-4f54-428d-9c3d-fe588e6c29ee" />
 
+### 11.Log Entry
+
+<img width="1834" height="293" alt="image" src="https://github.com/user-attachments/assets/39438256-b978-4e8b-9cad-14417b971da7" />
+
+
 
 
 
