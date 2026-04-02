@@ -1,6 +1,6 @@
 # 🧾 AI Invoice Extraction & Billing Automation
 
-This Automation stop manually entering data from invoices. This **n8n workflow** automatically detects new invoice files, uses **Open AI** to read the contents, logs the details into a spreadsheet, and notifies your billing team—all within seconds of a file being uploaded.
+This Automation stop manually entering data from invoices. This **n8n workflow** automatically detects new invoice files, uses **Open AI** to read the contents, logs the details into a spreadsheet, and notifies the billing team—all within seconds of a file being uploaded.
 
 ---
 
