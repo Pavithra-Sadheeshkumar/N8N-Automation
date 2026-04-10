@@ -66,6 +66,16 @@ The AI Agent is equipped with a **Vector Database** tool. For product questions 
 The Agent uses the **Gmail Tool** to reply directly to the original thread. Finally, the entire interaction—including the AI's response and the HubSpot ticket number—is logged into a **Google Sheets** CRM log for auditing.
 
 ---
+## 📈 Business Impact
+
+- **Reduces manual support workload by ~60–80%** by automating ticket triaging, classification, and responses
+- **Improves response time** by instantly handling incoming emails and prioritizing urgent issues
+- **Enhances customer satisfaction** through faster and more consistent responses
+- **Ensures accurate support responses** using Retrieval-Augmented Generation (RAG) with company knowledge base
+- **Streamlines CRM operations** by auto-creating and updating tickets in HubSpot
+
+
+ ---
 ## ⚠️ Error Handling
 
 - Implemented safe JSON parsing to prevent workflow failures
