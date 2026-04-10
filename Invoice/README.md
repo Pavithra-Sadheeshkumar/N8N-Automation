@@ -3,8 +3,7 @@
 This Automation stop manually entering data from invoices. This **n8n workflow** automatically detects new invoice files, uses **Open AI** to read the contents, logs the details into a spreadsheet, and notifies the billing team—all within seconds of a file being uploaded.
 
 ---
-##   Business Impact
-This automation reduces manual data entry time by 90%, minimizes human error in financial logging, and ensures 100% of invoices are captured within 60 seconds of arrival."
+
 
 ## ✨ Key Features
 
@@ -75,8 +74,17 @@ Integrate OCR capabilities (e.g., OCR.space or Google Vision API) to process sca
 Extend the system to handle multiple input formats such as:
 - PDF (scanned and digital)  
 - Images (JPG, PNG)  
-- Email attachments  
+- Email attachments
 
+  ---
+
+## 📈 Business Impact
+
+-Reduces manual data entry time by 90%.
+-Minimizes human error in financial logging
+-Ensures 100% of invoices are captured within 60 seconds of arrival.
+
+---
 
 ## ⚙️ Setup Instructions
 
