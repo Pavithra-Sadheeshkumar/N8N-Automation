@@ -7,7 +7,7 @@ This repository contains a collection of professional automation workflows built
 ### 1. Lead Qualification Automation
 - **Goal:** Automate the transition from raw web-form data to qualified sales leads.
 - **Key Logic:** Syntax validation, 3rd-party enrichment (Hunter.io), Lead Scoring, and automated PDF briefing generation.
-- **Integrations:** Google Forms, Hunter.io, Google Drive, Slack, and Gmail.
+- **Integrations:** n8n forms, Hunter.io, Google Drive, Slack, and Gmail.
 
 ### 2. Customer Support AI Automation
 - **Goal:** Reduce response times by using AI to categorize and draft replies for support tickets.
