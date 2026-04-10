@@ -49,6 +49,17 @@ Once extracted, the data is formatted and appended to a **Google Sheets** docume
 Finally, the AI drafts a JSON-formatted email subject and body. This is sent to the internal billing contact, providing a summary and a link to the master database for review.
 
 ---
+## 🔮 Future Improvements
+
+### 1. OCR Support for Scanned Invoices
+Integrate OCR capabilities (e.g., OCR.space or Google Vision API) to process scanned PDFs and image-based invoices.
+
+### 2. Multi-format Support
+Extend the system to handle multiple input formats such as:
+- PDF (scanned and digital)  
+- Images (JPG, PNG)  
+- Email attachments  
+
 
 ## ⚙️ Setup Instructions
 
