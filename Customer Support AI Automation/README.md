@@ -66,6 +66,13 @@ The AI Agent is equipped with a **Vector Database** tool. For product questions 
 The Agent uses the **Gmail Tool** to reply directly to the original thread. Finally, the entire interaction—including the AI's response and the HubSpot ticket number—is logged into a **Google Sheets** CRM log for auditing.
 
 ---
+## ⚠️ Error Handling
+
+- Implemented safe JSON parsing to prevent workflow failures
+- Configured retry on failure for external API calls
+- Handles missing or invalid AI responses gracefully
+
+  ---
 
 ## ⚙️ Setup Instructions
 
