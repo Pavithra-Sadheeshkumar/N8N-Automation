@@ -141,7 +141,7 @@ graph TD
 
 - Configured retry on failure for external API calls
 - Handles temporary API failures and timeouts
-- Logs failed executions for monitoring and debugging
+- Ensures reliable execution of critical workflow steps
 
   ---
     
