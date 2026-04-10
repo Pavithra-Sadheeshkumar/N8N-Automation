@@ -129,6 +129,21 @@ graph TD
 * **Communication**: Slack, Gmail
 * **Productivity**: Google Docs, Google Drive, Google Calendar
 ---
+## 📈 Business Impact
+
+- Reduces manual lead qualification effort by ~70%
+- Speeds up response time for high-value leads
+- Improves lead conversion through timely engagement
+- Ensures consistent and scalable lead processing
+
+---
+## ⚠️ Error Handling
+
+- Configured retry on failure for external API calls
+- Handles temporary API failures and timeouts
+- Logs failed executions for monitoring and debugging
+
+  ---
     
 ## ⚙️ Setup
 
