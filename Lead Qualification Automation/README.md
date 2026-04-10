@@ -150,42 +150,42 @@ graph TD
 <img width="1668" height="702" alt="image" src="https://github.com/user-attachments/assets/eaa094f8-9d7c-4d22-b53f-6087c92338ef" />
 
 
-### 2.Lead Submission Form
+### 2. Lead Submission Form
 
 <img width="1207" height="682" alt="image" src="https://github.com/user-attachments/assets/c1d8909a-0cd5-4f28-965b-df9a60a611d5" />
 
-### 3.Enrich Lead Information
+### 3. Enrich Lead Information
 
 <img width="1847" height="782" alt="image" src="https://github.com/user-attachments/assets/a2c8edf4-bb31-4f34-87c7-9e580a63a551" />
 
 ### 4. Check for new or existing customer in CRM based on the email address.
-       When the email adress is found it returns the data with the details available on CRM otherwise no output is returned and treated as **NEW CUSTOMER**
+       When the email address is found it returns the data with the details available on CRM otherwise no output is returned and treated as **NEW CUSTOMER**
 
 <img width="1285" height="811" alt="image" src="https://github.com/user-attachments/assets/8d4df975-7ab3-43f8-9a5f-a3b5f361b9a0" />
 
 <img width="1835" height="767" alt="image" src="https://github.com/user-attachments/assets/12a53b60-7503-496b-9c4c-bf697e3a7617" />
 
-### 5.The Lead is classified as NEW,GENERAL OR VIP
+### 5. The Lead is classified as NEW,GENERAL OR VIP
 
 
 <img width="1833" height="815" alt="image" src="https://github.com/user-attachments/assets/287b109e-ebfb-4a29-b837-7e4330c50bc5" />
 
-### 6.Lead score is calculated based on email score,Industry and REgion
+### 6. Lead score is calculated based on email score,industry and region
 
 <img width="1856" height="720" alt="image" src="https://github.com/user-attachments/assets/4a6b0179-2673-4335-8dcb-c69c92af8a3c" />
 
-### 7.Lead Qualified Brief have been created ion Google Drive and the value has been updated dynamically
+### 7. Lead Qualification Brief is created in Google Drive and values are updated dynamically
 
 <img width="1460" height="466" alt="image" src="https://github.com/user-attachments/assets/9d9e8f97-dfcc-421f-bf39-1a14ebb5c85e" />
 
 ### 8. Sample values have been updated
 <img width="918" height="813" alt="image" src="https://github.com/user-attachments/assets/bae866c0-1d23-4451-a836-600b9108fb4e" />
 
-### 9.Content Coordinator have been notified
+### 9. Content Coordinator have been notified
 
 <img width="1146" height="447" alt="image" src="https://github.com/user-attachments/assets/ca80be2c-9ee5-4759-be04-7ac287a29b72" />
 
-### 10.At the same time Account executive have been notified and calendar event have been created and welcome email have been sent to the lead
+### 10. At the same time Account executive have been notified and calendar event have been created and welcome email have been sent to the lead
 
 <img width="1212" height="668" alt="image" src="https://github.com/user-attachments/assets/bb7f19c8-6e01-492a-ac1f-f5ea78f9b275" />
 
@@ -193,7 +193,7 @@ graph TD
 
 <img width="720" height="627" alt="image" src="https://github.com/user-attachments/assets/f02eb02e-4f54-428d-9c3d-fe588e6c29ee" />
 
-### 11.Log Entry
+### 11. Log Entry
 
 <img width="1834" height="293" alt="image" src="https://github.com/user-attachments/assets/39438256-b978-4e8b-9cad-14417b971da7" />
 
