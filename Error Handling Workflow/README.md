@@ -100,7 +100,7 @@ formatting without needing to trigger a real error.
 
 ### 1. Workflow Execution
 
-<img width="1557" height="790" alt="image" src="https://github.com/user-attachments/assets/6a5612f7-68d8-47df-965d-23a1e110d4d6" />
+<img width="1517" height="787" alt="image" src="https://github.com/user-attachments/assets/f801ee2a-1b04-43ba-b99e-598f0769e528" />
 
 ### 2. Error workflow
 
