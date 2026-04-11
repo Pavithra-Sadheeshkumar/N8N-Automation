@@ -5,7 +5,7 @@ This centralized n8n error-handling workflow automatically captures failures acr
 ---
 ## 🌟 Features 
 * **Automated Error Detection**: Instantly captures failures across all workflows using a global Error Trigger.
-* **Dynamic Priority Routing**: Automatically sorts errors into "High" or "Low" priority based on HTTP codes and error messages.
+* **Dynamic Priority Routing**: Automatically sorts errors into "High" ,"Low" or "Medium" priority based on HTTP codes and error messages.
 * **Smart Lookups**: Retrieves workflow owner details and Slack IDs from a centralized Google Sheet for personalized alerts.
 * **Interactive Slack Alerts**: Sends rich notifications with "Debug Here" buttons that link directly to the failed execution.
 * **Automated Audit Logging**: Maintains a historical record of all errors, including node names and error messages, in Google Sheets.
@@ -18,27 +18,44 @@ This centralized n8n error-handling workflow automatically captures failures acr
 3.  **Priority Evaluation**: A **Switch Node** checks the error message and HTTP code:
     * **Low Priority**: Triggered by "Missing Information" or "Invalid Data" messages.
     * **High Priority**: Triggered by specific HTTP error codes (e.g., `400`, `404`).
+    *  **Medium Priority**: Default fallback branch for all uncategorized errors.
 4.  **Notification**: 
     * **High Priority**: Sends a detailed, interactive **Slack message** directly to the workflow owner with a "Debug" button.
     * **Low Priority**: Sends a summary **Gmail notification** to the general team.
+    *  **Medium Priority**: Sends a Slack alert to the team.
 5.  **Logging**: Every error is logged back into a **Google Sheet** (Log Error tab) with the error message, node name, execution URL, and priority level.
 
 
 
 
 ```mermaid
-graph TD
-    A[Global Error Trigger] --> B[Fetch Workflow Metadata]
-    B --> C{Priority Evaluation}
 
-    C -->|Low Priority| D[Set Low Priority]
-    C -->|High Priority| E[Set High Priority]
+  graph TD
+    %% Start of the Error Handler
+    Start([Error Trigger]) --> GetDetails[Get Workflow Details from Google Sheets]
+    
+    %% Priority Evaluation Logic
+    GetDetails --> Priority{Evaluate Error Priority}
 
-    D --> F[Gmail Team Notification]
-    E --> G[Slack Owner Alert]
+    %% Low Priority Branch
+    Priority -- Low Priority --> Gmail[Notify Team via Gmail]
+    Gmail --> LogLow[Log Low Priority Error in Sheets]
 
-    F --> H[Audit Log in Google Sheets]
-    G --> H
+    %% High Priority Branch
+    Priority -- High Priority --> SlackOwner[Notify Workflow Owner via Slack]
+    SlackOwner --> LogHigh[Log High Priority Error in Sheets]
+
+    %% Default/Medium Branch
+    Priority -- Default / Fallback --> SetMed[Set Medium Priority]
+    SetMed --> SlackTeam[Notify Team via Slack]
+    SlackTeam --> LogMed[Log Medium Priority Error in Sheets]
+
+    %% Styling for clarity
+    style Start fill:#f96,stroke:#333,stroke-width:2px
+    style Priority fill:#bbf,stroke:#333,stroke-width:2px
+    style LogLow fill:#dfd,stroke:#333
+    style LogHigh fill:#fdd,stroke:#333
+    style LogMed fill:#fff4dd,stroke:#333
 ```
 
 
@@ -96,6 +113,9 @@ formatting without needing to trigger a real error.
 ### 4.Slack Notification
 
 <img width="1157" height="637" alt="image" src="https://github.com/user-attachments/assets/7c8b6788-597a-4fc3-8e30-de9bf3eab309" />
+
+
+
 
 
 
