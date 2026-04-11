@@ -1,6 +1,8 @@
 # 🧾 AI Invoice Extraction & Billing Automation
 
-This Automation stop manually entering data from invoices. This **n8n workflow** automatically detects new invoice files, uses **Open AI** to read the contents, logs the details into a spreadsheet, and notifies the billing team—all within seconds of a file being uploaded.
+This solution eliminates manual invoice data entry by automating the full invoice intake lifecycle—from file detection and intelligent data extraction to validation, duplicate checks, centralized logging, and billing team notifications.
+
+The workflow improves processing speed, reduces human error, and ensures audit-ready invoice tracking.
 
 ---
 
@@ -20,26 +22,35 @@ This Automation stop manually entering data from invoices. This **n8n workflow**
 ## 🏗️ System Architecture
 
 ```mermaid
-graph TD
-    A[Google Drive: New File] --> B{Check: Is PDF?}
-    B -- No --> C[Log Format Error]
-    B -- Yes --> D[AI: Extract Data]
-    D --> E{Check: Data Valid?}
-    E -- No --> F[Log Validation Error & Slack Alert]
-    E -- Yes --> G{Check: Duplicate?}
-    G -- Yes --> H[Log Duplicate Error]
-    G -- No --> I[Google Sheets: Success Log]
-    I --> J[AI: Generate Email]
-    J --> K[Gmail: Notify Billing]
 
+graph TD
+    A[Google Drive: New Invoice File] --> B{Valid File Format?}
+    
+    B -->|No| C[Log Error: Invalid Format]
+    B -->|Yes| D[Download File]
+    
+    D --> E[Extract Text from PDF]
+    E --> F{Text Available?}
+    
+    F -->|No| G[Log Error: Empty / Unreadable File]
+    F -->|Yes| H[AI Information Extraction]
+    
+    H --> I{Validation Check}
+    
+    I -->|Failed| J[Error Log: Validation Failed]
+    J --> K[Slack Notification]
+    
+    I -->|Passed| L[Duplicate Check in Google Sheets]
+    
+    L -->|Duplicate Found| M[Error Log: Duplicate Entry]
+    L -->|New Invoice| N[Append to Invoice Master Sheet]
+    
+    N --> O[AI Generate Email Notification]
+    O --> P[Send Gmail to Billing Team]
 ```
 
-## 🛠️ Tech Stack
 
-* **Automation Engine**: [n8n.io]
-* **AI Models**: OpenAI GPT-4o-mini
-* **Storage**: Google Drive & Google Sheets
-* **Communication**: Gmail
+
 
 ---
 
@@ -65,16 +76,39 @@ Once extracted, the data is formatted and appended to a **Google Sheets** docume
 Finally, the AI drafts a JSON-formatted email subject and body. This is sent to the internal billing contact, providing a summary and a link to the master database for review.
 
 ---
-## 🔮 Future Improvements
+## ✅ Data Validation & Exception Handling
 
-### 1. OCR Support for Scanned Invoices
-Integrate OCR capabilities (e.g., OCR.space or Google Vision API) to process scanned PDFs and image-based invoices.
+To ensure data integrity and process reliability, the workflow includes multiple validation layers:
 
-### 2. Expanded Format Support
-Extend the system to handle multiple input formats such as:
-- PDF (scanned and digital)  
-- Images (JPG, PNG)  
-- Email attachments
+### File Validation
+- Accepts only PDF files
+- Invalid formats are routed to Error Log
+
+### Extraction Validation
+The workflow validates:
+- Invoice Number exists
+- Invoice Date exists
+- Total Amount > 0
+
+If validation fails:
+- Record is logged into Error Log sheet
+- Slack notification is sent to operations team
+
+### Duplicate Check
+Before inserting into the master invoice sheet, the workflow checks whether the Invoice Number already exists.
+
+If duplicate found:
+- Record is redirected to Error Log
+- Duplicate reason is captured
+- New row insertion is skipped
+
+  ---
+  
+## 🔮 Future Enhancements
+
+- OCR support for scanned and image-based invoices
+- Auto-approval workflow for low-risk invoices
+- Extend the workflow to process multiple invoice input formats
 
   ---
 
@@ -85,6 +119,15 @@ Extend the system to handle multiple input formats such as:
 -Ensures 100% of invoices are captured within 60 seconds of arrival.
 
 ---
+
+## 🛠️ Tech Stack
+
+* **Automation Engine**: [n8n.io]
+* **AI Models**: OpenAI GPT-4o-mini
+* **Storage**: Google Drive & Google Sheets
+* **Communication**: Gmail
+
+  ---
 
 ## ⚙️ Setup Instructions
 
