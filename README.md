@@ -2,6 +2,8 @@
 
 This repository contains a collection of professional automation workflows built using **n8n**. My focus is on creating "chaos-free," scalable, and secure IT processes that bridge the gap between business needs and technical execution.
 
+---
+
 ## 🚀 Projects
 
 ### 1. Lead Qualification Automation
@@ -10,16 +12,25 @@ This repository contains a collection of professional automation workflows built
 - **Integrations:** n8n forms, Hunter.io, Google Drive, Slack, and Gmail.
 
 ### 2. Customer Support AI Automation
-- **Goal:** Reduce response times by using AI to categorize and draft replies for support tickets.
-
+- **Goal:** Automate customer support responses to improve response time and reduce manual workload.
+- **Key Logic:**  Ticket classification, intent detection, AI-generated responses and response tracking.
+- **Integrations:** n8n, OpenAI, Gmail , Slack, Airtable
+  
 ### 3. Order Status Automation
 - **Goal:** Real-time synchronization between e-commerce platforms and internal tracking sheets.
+-  **Key Logic:** Order ID validation, ERP lookup for sales order and delivery status, shipment tracking synchronization and automated customer notification.
+-   **Integrations:** n8n forms ,Google Sheets, Slack, Gmail, and CRM system.
 
 ### 4. Invoice Processing Automation
 - **Goal:** Extracting data from PDF invoices and pushing it to accounting software via API.
+-  **Key Logic:** Invoice data extraction (PDF/email attachment), field validation, duplicate invoice check and automated status notification
+-   **Integrations:** Gmail, AI extraction service, Google Drive and Slack
 
 ### 5. Sales Follow-up Automation
-- **Goal:** Intelligent scheduling and personalized follow-ups based on customer engagement levels.
+- **Goal:**  Automate sales email follow-ups by analyzing incoming replies and generating context-aware responses.
+- **Key Logic:** Email parsing, AI-based content cleaning, sentiment analysis, and dynamic response generation (Positive / Neutral / Negative)
+- **Integrations:** n8n, OpenAI, Gmail, Airtable
+
 
 ---
 
@@ -37,4 +48,5 @@ This repository contains a collection of professional automation workflows built
 - **Cloud/Saas:**  Slack, Google Workspace, Hunter.io
 
 ---
+
 **Contact:** Pavithra Nagarajan | Lohr am Main, Germany
