@@ -1,6 +1,6 @@
 # 🛠️ Error Handling Workflow (n8n)
 
-This workflow serves as a centralized error-handling system for your n8n environment. It automatically triggers whenever another workflow fails, evaluates the severity of the error, notifies the relevant team members via Slack or Gmail, and logs the incident in Google Sheets for auditing.
+This centralized n8n error-handling workflow automatically captures failures across all workflows, classifies incidents by severity, routes alerts to the appropriate owners, and maintains an auditable support log for faster incident resolution.
 
 ---
 ## 🌟 Features 
@@ -24,23 +24,35 @@ This workflow serves as a centralized error-handling system for your n8n environ
 5.  **Logging**: Every error is logged back into a **Google Sheet** (Log Error tab) with the error message, node name, execution URL, and priority level.
 
 
+
+
 ```mermaid
-
 graph TD
-    A[Error Trigger] --> B[Get Workflow Details from Google Sheets]
-    B --> C{Evaluate Error Priority}
-    
-    C -- "Contains 'Missing Information' / 'Invalid Data'" --> D[Set Low Priority]
-    C -- "HTTP Code 400/404" --> E[Set High Priority]
-    
-    D --> F[Notify Team via Gmail]
-    E --> G[Notify Workflow Owner via Slack]
-    
-    F --> H[Log Error to Google Sheets]
-    G --> I[Log Error to Google Sheets]
+    A[Global Error Trigger] --> B[Fetch Workflow Metadata]
+    B --> C{Priority Evaluation}
 
+    C -->|Low Priority| D[Set Low Priority]
+    C -->|High Priority| E[Set High Priority]
+
+    D --> F[Gmail Team Notification]
+    E --> G[Slack Owner Alert]
+
+    F --> H[Audit Log in Google Sheets]
+    G --> H
 ```
+
+
 ---
+
+## 📈 Business Benefits
+
+- Enables owner-based alert routing
+- Maintains centralized audit trail
+- Improves root cause analysis
+- Supports production operations governance
+
+  ---
+  
 ## **Tech Stack**
 * **n8n**: Low-code workflow automation and error-trigger logic.
 * **Google Sheets**: Workflow metadata lookup and error logging.
