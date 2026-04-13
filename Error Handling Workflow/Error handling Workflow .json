@@ -1,0 +1,784 @@
+{
+  "name": "Error handling Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        224
+      ],
+      "id": "b2ae239c-6150-4efd-9a7b-f3b0a68fe804",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY",
+          "mode": "list",
+          "cachedResultName": "Workflow Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Workflow name",
+              "lookupValue": "={{ $json.workflow.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -464,
+        224
+      ],
+      "id": "afe2a666-911d-497f-9a78-991685275f34",
+      "name": "Get Workflow Details",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LGQHrtd49uHxvNRa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2e92ec8f-59dc-48c1-92b9-1739eb80f61f",
+                    "leftValue": "={{[\"Missing Information\",\"Invalid Data\"]}}",
+                    "rightValue": "={{ $('Error Trigger').item.json.execution.error.message }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Low Priority"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "180ac236-5b25-4be1-b077-0812721f80ef",
+                    "leftValue": "={{ [\"400\",\"404\"].toJsonString() }}",
+                    "rightValue": "={{ $('Error Trigger').item.json.execution.error.message }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "High Priority"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        224
+      ],
+      "id": "d8307c64-9800-43ea-9167-c542b7301e19",
+      "name": "Evaluate Error Priorty"
+    },
+    {
+      "parameters": {
+        "sendTo": "pavinp5@gmail.com",
+        "subject": "=Error Occurred in the Workflow : {{ $json['Workflow name'] }}",
+        "message": "=<b> Workflow Alert: </b> {{ $json['Workflow name'] }}Failed <br/>\n<b> Error Message: </b> {{ $node['Error Trigger'].json.execution.error.message }} <br/>\n<b> Error Node: </b>{{ $node['Error Trigger'].json.execution.lastNodeExecuted }}<br/>\n<b> Execution Details: </b> <a href= {{ $node['Error Trigger'].json.execution.url }}\n>Debug here</a>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        32
+      ],
+      "id": "e191486e-766f-455d-a3d7-5f01de5b2f2f",
+      "name": "Notify Team",
+      "webhookId": "7118888b-0521-4fee-9bb0-6ce4cc8e4f5f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hD7erqUkx6dQ2wgk",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $json['Slack id'] }}",
+          "mode": "id"
+        },
+        "messageType": "block",
+        "blocksUi": "={{ {\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*🚨 Workflow Failure Detected!*\\\\n <\" + $('Error Trigger').item.json.execution.url + \"| Click here to Debug>\"\n      }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*📁Workflow Name:*\\\\n \" + $json[\"Workflow name\"] + \" Failed\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*👤Assigned To:*\\\\n \" + $json[\"Owner Name\"] + \" | \" + $json[\"Email id\"]\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*🛑Potential Error Node:*\\\\n \" + $('Error Trigger').item.json.execution.error.node.type\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*⚠️Potential Error message:*\\\\n \" + $('Error Trigger').item.json.execution.error.message\n        }\n      ]\n    },\n    {\n      \"type\": \"actions\",\n      \"elements\": [\n        {\n          \"type\": \"button\",\n          \"text\": {\n            \"type\": \"plain_text\",\n            \"text\": \"Debug Here\"\n          },\n          \"style\": \"danger\",\n          \"url\": $('Error Trigger').item.json.execution.url + $('Error Trigger').item.json.execution.id\n        }\n      ]\n    }\n  ]\n}.toJsonString() }}",
+        "text": "=",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        192,
+        224
+      ],
+      "id": "f6196807-9ac5-4551-bab3-f8568d9e1381",
+      "name": "Notify workflow Owner",
+      "webhookId": "2f0e453a-c3d7-4403-b5a0-b25d6ef63347",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "xcGU7vQzzNKu5urx",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "07469419-3586-4d8d-b11e-31b4d97057f9",
+              "name": "Priority",
+              "value": "High",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        224
+      ],
+      "id": "21fcb4f9-d63d-4bbb-8b45-fbc75ec3ccec",
+      "name": "Set High Priority"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "65630a09-5034-47a9-9194-4ea4d5b1fba1",
+              "name": "Priority",
+              "value": "Low",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        32
+      ],
+      "id": "48aa72bb-f960-4532-adde-35eb11d0a7e5",
+      "name": "Set Low Priority"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b76f417c-1909-4c21-8675-d60bfd77ce98",
+              "name": "Priority",
+              "value": "Medium",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        384
+      ],
+      "id": "fabb08cf-36c2-468d-b4a2-73061cd0fb13",
+      "name": "Set Medium Priority"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U0AM1KJP0BC",
+          "mode": "list",
+          "cachedResultName": "pavithrasadheeshkumar"
+        },
+        "text": "=<b> Workflow Alert: </b> {{ $json['Workflow name'] }}Failed <br/>\n<b> Error Message: </b> {{ $node['Error Trigger'].json.execution.error.message }} <br/>\n<b> Error Node: </b>{{ $node['Error Trigger'].json.execution.lastNodeExecuted }}<br/>\n<b> Execution Details: </b> <a href= {{ $node['Error Trigger'].json.execution.url }}\n>Debug here</a>",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        192,
+        384
+      ],
+      "id": "c1e1d29a-a2c2-4019-8e74-0d78b42c871e",
+      "name": "Notify Team1",
+      "webhookId": "a63a47dd-d8e2-42f3-86cd-39c0a51b2b29",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "xcGU7vQzzNKu5urx",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY",
+          "mode": "list",
+          "cachedResultName": "Workflow Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 358686048,
+          "mode": "list",
+          "cachedResultName": "Log Error",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY/edit#gid=358686048"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Workflow NAme": "={{ $('Get Workflow Details').item.json['Workflow name'] }}",
+            "URL": "={{ $('Error Trigger').item.json.execution.url }}",
+            "Error Node": "={{ $('Error Trigger').item.json.execution.lastNodeExecuted }}",
+            "Error Message": "={{ $('Error Trigger').item.json.execution.error.message }}",
+            "Priority": "={{ $('Set Low Priority').item.json.Priority }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Workflow NAme",
+              "displayName": "Workflow NAme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error Node",
+              "displayName": "Error Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        432,
+        32
+      ],
+      "id": "1e4d2669-c426-42c9-8834-7db9632f36f3",
+      "name": "Log Low Priority Error",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LGQHrtd49uHxvNRa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY",
+          "mode": "list",
+          "cachedResultName": "Workflow Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 358686048,
+          "mode": "list",
+          "cachedResultName": "Log Error",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY/edit#gid=358686048"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Workflow NAme": "={{ $('Get Workflow Details').item.json['Workflow name'] }}",
+            "URL": "={{ $('Error Trigger').item.json.execution.url }}",
+            "Error Node": "={{ $('Error Trigger').item.json.execution.lastNodeExecuted }}",
+            "Error Message": "={{ $('Error Trigger').item.json.execution.error.message }}",
+            "Priority": "={{ $('Set High Priority').item.json.Priority }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Workflow NAme",
+              "displayName": "Workflow NAme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error Node",
+              "displayName": "Error Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        224
+      ],
+      "id": "09cb24ec-ef31-4843-90d5-05ac07465ac6",
+      "name": "Log High Priority Error",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LGQHrtd49uHxvNRa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY",
+          "mode": "list",
+          "cachedResultName": "Workflow Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 358686048,
+          "mode": "list",
+          "cachedResultName": "Log Error",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RlxG7DSC8CsoZ10ZO9bjrZco4cfN0D7tMEIGd9KzCCY/edit#gid=358686048"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Workflow NAme": "={{ $('Get Workflow Details').item.json['Workflow name'] }}",
+            "URL": "={{ $('Error Trigger').item.json.execution.url }}",
+            "Error Node": "={{ $('Error Trigger').item.json.execution.lastNodeExecuted }}",
+            "Error Message": "={{ $('Error Trigger').item.json.execution.error.message }}",
+            "Priority": "=={{ $('Set Medium Priority').item.json.Priority }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Workflow NAme",
+              "displayName": "Workflow NAme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error Node",
+              "displayName": "Error Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        384
+      ],
+      "id": "3806cd59-65c0-4dc5-961d-34361bd761d4",
+      "name": "Log Medium Priority Error",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LGQHrtd49uHxvNRa",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Error Trigger": [
+      {
+        "json": {
+          "execution": {
+            "id": "533",
+            "url": "https://pavisad.app.n8n.cloud/workflow/zwBa9ozzcWn9F5qQ/executions/533",
+            "error": {
+              "level": "warning",
+              "tags": {},
+              "description": "It looks like you’ve used all your free credits for the n8n. Follow our [documentation](https://docs.n8n.io/integrations/builtin/credentials/openai) to create your own credential.",
+              "timestamp": 1774605162560,
+              "context": {
+                "itemIndex": 0
+              },
+              "functionality": "regular",
+              "name": "NodeApiError",
+              "node": {
+                "parameters": {
+                  "resource": "text",
+                  "operation": "response",
+                  "modelId": {
+                    "__rl": true,
+                    "value": "gpt-4.1-mini",
+                    "mode": "list",
+                    "cachedResultName": "GPT-4.1-MINI"
+                  },
+                  "responses": {
+                    "values": [
+                      {
+                        "type": "text",
+                        "role": "user",
+                        "content": "You are a helpful email Assistant that writes friendly replies back to the client in a professional way and follow up"
+                      },
+                      {
+                        "type": "text",
+                        "role": "system",
+                        "content": "=You are a Professional Email Assistant specializing in replying to clients who have responded neutrally.\n\nYour task:\n- Write a clear, friendly, and professional response to a client’s neutral reply.\n- Maintain a polite and respectful tone.\n- Address any questions or requests in their message.\n- Provide useful information, clarification, or next steps as appropriate.\n- Encourage continued engagement without being pushy.\n- Keep the email concise, professional, and easy to read.\n\nEmail Formatting Rules:\n- Include a clear body responding to the client’s message.\n- Offer helpful follow-up or next steps if relevant.\n- End with a professional closing (e.g., \"Best regards,\" Pavithra,AH Group.\n- Do not include quoted email threads or signatures from the client.\n\nOutput:\n- Return only the final email text ready to send.\n- Ensure proper grammar, punctuation, and clear formatting."
+                      }
+                    ]
+                  },
+                  "simplify": true,
+                  "builtInTools": {},
+                  "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.openAi",
+                "typeVersion": 2.1,
+                "position": [
+                  1104,
+                  128
+                ],
+                "id": "918fdf59-4ba6-4f45-acf4-df815c408459",
+                "name": "Neutral Reply",
+                "credentials": {
+                  "openAiApi": {
+                    "id": "knhweLUXWDR0SurQ",
+                    "name": "n8n free OpenAI API credits"
+                  }
+                }
+              },
+              "messages": [
+                "400 - {\"error\":{\"code\":400,\"message\":\"It looks like you’ve used all your free credits for the n8n. Follow our [documentation](https://docs.n8n.io/integrations/builtin/credentials/openai) to create your own credential.\",\"type\":\"free_ai_credits_request_error\"}}"
+              ],
+              "httpCode": "400",
+              "message": "Bad request - please check your parameters",
+              "stack": "NodeApiError: Bad request - please check your parameters\n    at ExecuteContext.requestWithAuthentication (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/node-execution-context/utils/request-helper-functions.ts:1540:10)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at ExecuteContext.requestWithAuthentication (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/node-execution-context/utils/request-helper-functions.ts:1841:11)\n    at ExecuteContext.apiRequest (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+n8n-nodes-langchain@file+packages+@n8n+nodes-langchain_6626676b36b9e45b1aba3b7dc84f924c/node_modules/@n8n/n8n-nodes-langchain/nodes/vendors/OpenAi/transport/index.ts:56:19)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+n8n-nodes-langchain@file+packages+@n8n+nodes-langchain_6626676b36b9e45b1aba3b7dc84f924c/node_modules/@n8n/n8n-nodes-langchain/nodes/vendors/OpenAi/v2/actions/text/response.operation.ts:607:18)\n    at ExecuteContext.router (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+n8n-nodes-langchain@file+packages+@n8n+nodes-langchain_6626676b36b9e45b1aba3b7dc84f924c/node_modules/@n8n/n8n-nodes-langchain/nodes/vendors/OpenAi/v2/actions/router.ts:58:25)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+n8n-nodes-langchain@file+packages+@n8n+nodes-langchain_6626676b36b9e45b1aba3b7dc84f924c/node_modules/@n8n/n8n-nodes-langchain/nodes/vendors/OpenAi/v2/OpenAiV2.node.ts:93:10)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1043:8)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1222:11)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1668:27\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2313:11"
+            },
+            "lastNodeExecuted": "Neutral Reply",
+            "mode": "trigger",
+            "executionContext": {
+              "version": 1,
+              "establishedAt": 1774605153062,
+              "source": "trigger",
+              "redaction": {
+                "version": 1,
+                "policy": "none"
+              },
+              "triggerNode": {
+                "name": "Gmail Trigger",
+                "type": "n8n-nodes-base.gmailTrigger"
+              }
+            }
+          },
+          "workflow": {
+            "id": "zwBa9ozzcWn9F5qQ",
+            "name": "AI Sales Email Follow up"
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Workflow Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Workflow Details": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Error Priorty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Error Priorty": {
+      "main": [
+        [
+          {
+            "node": "Set Low Priority",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set High Priority",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Medium Priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team": {
+      "main": [
+        [
+          {
+            "node": "Log Low Priority Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify workflow Owner": {
+      "main": [
+        [
+          {
+            "node": "Log High Priority Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set High Priority": {
+      "main": [
+        [
+          {
+            "node": "Notify workflow Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Low Priority": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Medium Priority": {
+      "main": [
+        [
+          {
+            "node": "Notify Team1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Team1": {
+      "main": [
+        [
+          {
+            "node": "Log Medium Priority Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "98390d1f-10fb-4e2e-9879-83e31cc59073",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e43bfcc30ebdbfeec202a9a566de04ee4b9da3e9b8e5a3bb729ab1a4010d9b28"
+  },
+  "id": "WbPWtuCfPPieCgC0",
+  "tags": []
+}
